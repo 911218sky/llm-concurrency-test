@@ -99,71 +99,13 @@ browser, the page, and the endpoint you configured.
 See [`extension/README.md`](extension/README.md) for the wire protocol,
 permissions rationale, and limitations.
 
-## Export format
-
-### JSON
-
-`Download JSON` produces a pretty-printed file:
-
-```json
-{
-  "version": 1,
-  "exported_at": "2026-06-30T...",
-  "test_start_iso": "...",
-  "test_end_iso": "...",
-  "wall_time_s": 2.218,
-  "concurrency_requested": 5,
-  "success_count": 5,
-  "total_tokens": 718,
-  "aggregate_tokens_per_sec": 80.16,
-  "overlap_ratio": 3.2,
-  "verdict": "Concurrent — requests processed in parallel",
-  "verdict_kind": "success",
-  "results": [
-    {
-      "index": 1,
-      "status": "success",
-      "http_status": 200,
-      "start_iso": "...",
-      "end_iso": "...",
-      "start_offset_s": 0.001,
-      "end_offset_s": 2.218,
-      "duration_s": 2.217,
-      "first_chunk_offset_s": 0.404,
-      "ttft_s": 0.403,
-      "completion_tokens": 144,
-      "tokens_per_sec": 64.97,
-      "stream_status": "ok",
-      "error": null
-    }
-  ]
-}
-```
-
-### CSV
-
-`Download CSV` produces one row per request with the columns:
-
-```
-index,status,http_status,start_iso,end_iso,start_offset_s,end_offset_s,
-duration_s,first_chunk_offset_s,ttft_s,completion_tokens,tokens_per_sec,error
-```
-
-Fields containing `,`, `"`, or newline are double-quoted; inner `"` is
-doubled.
-
-## Configuration persistence
-
-API key, endpoint, model, and provider selection are persisted in
-`localStorage` under `llmct_*` keys. The theme preference uses
-`llmct_theme`. Nothing else is stored — runs and exports are session-only.
-
 ## Repo layout
 
 ```
 .
 ├── README.md            ← this file
 ├── CLAUDE.md            ← project notes for AI assistants (and humans)
+├── LICENSE              ← MIT license (free for commercial + personal use)
 ├── index.html           ← the entire web app (HTML + inline CSS + JS)
 ├── extension/
 │   ├── manifest.json    ← MV3 manifest
@@ -173,22 +115,7 @@ API key, endpoint, model, and provider selection are persisted in
 └── .gitignore
 ```
 
-## Limitations
-
-- **CORS.** Without the extension, the API must allow browser-origin
-  requests. There is no client-side workaround for that — install the
-  extension or proxy the request through a server you control.
-- **Streaming bodies only.** The page assumes SSE-style responses. Providers
-  that ignore `stream: true` or emit non-standard shapes may produce
-  incomplete results; in that case the per-request `stream_status` will
-  read `empty`.
-- **No automated tests.** Verification is manual against real endpoints.
-  The Chrome extension's streaming relay in particular should be checked
-  end-to-end with a real API key after install.
-- **No history.** Test runs aren't saved between page loads. Export them
-  before navigating away.
-
 ## License
 
-No license file yet. Until one is added, all rights are reserved by the
-repo owner — please ask before redistributing.
+[MIT](LICENSE). Free for commercial and personal use. See
+[`LICENSE`](LICENSE) for the full text.
