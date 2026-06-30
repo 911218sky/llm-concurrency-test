@@ -1,15 +1,18 @@
 # LLM Concurrency Test
 
-A client-side load tester for LLM chat-completion APIs. Fires N requests in
-parallel from your browser at an OpenAI-compatible or Anthropic endpoint and
-measures whether the API actually processes them concurrently.
+The fastest load and concurrency tester for LLM chat-completion APIs
+(inference) that lives in your browser. Fires N parallel requests from
+your browser at an OpenAI-compatible or Anthropic endpoint and measures
+whether the API actually processes them concurrently. Includes streaming
+TTFT, live timeline, JSON/CSV export.
 
-If the API blocks browser-origin (CORS) requests, a small companion Chrome
-extension relays the requests through a background service worker so the
-same-origin policy no longer applies.
+If the API blocks browser-origin (CORS) requests, a small companion
+Chrome extension relays the requests through a background service worker
+so the same-origin policy no longer applies.
 
-- **Web page:** a single `index.html` — open it directly, host it as a static
-  page on GitHub Pages, or run a local server.
+- **Web page:** a single `index.html` — open it directly, host it on
+  GitHub Pages at `https://0xaungkon.github.io/llm-concurrency-test/`, or
+  run a local server.
 - **Extension:** under `extension/` — a 4-file MV3 add-on that adds a CORS
   bypass.
 - **No backend.** Your API key never leaves your browser.
