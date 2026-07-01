@@ -12,10 +12,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://0xaungkon.github.io/*",
-        "*://*.github.io/*",
-        "*://localhost/*",
-        "*://127.0.0.1/*"
+        "<all_urls>"
       ],
       "js": ["content.js"],
       "run_at": "document_start",

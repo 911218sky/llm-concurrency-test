@@ -10,8 +10,13 @@
 // The page-side shim in index.html builds a ReadableStream from the chunks we
 // forward, so callOnce's existing SSE parsing logic works unchanged.
 
+console.log('[LLMCT Relay] Content script loaded, hostname:', window.location.hostname);
+
 (() => {
-  if (window.__llmctExtensionBridge) return; // idempotent
+  if (window.__llmctExtensionBridge) {
+    console.log('[LLMCT Relay] Bridge already set, skipping.');
+    return; // idempotent
+  }
 
   try {
     Object.defineProperty(window, '__llmctExtensionBridge', {
@@ -19,9 +24,11 @@
       writable: false,
       configurable: false,
     });
+    console.log('[LLMCT Relay] Bridge flag set successfully.');
   } catch (e) {
     // Fallback for environments that don't allow redefinition.
     window.__llmctExtensionBridge = true;
+    console.log('[LLMCT Relay] Bridge flag set (fallback due to:', e.message, ')');
   }
 
   const PAGE_ORIGIN = window.location.origin;
@@ -30,7 +37,11 @@
     // Reject messages from any source other than this page.
     if (e.source !== window) return;
     const d = e.data;
-    if (!d || d.type !== 'llmct:fetch') return;
+    if (!d || d.type !== 'llmct:fetch') {
+      console.log('[LLMCT Relay] Received non-fetch message:', d?.type);
+      return;
+    }
+    console.log('[LLMCT Relay] Received fetch request for:', d?.url);
 
     const { id, url, method, headers, body } = d;
 
