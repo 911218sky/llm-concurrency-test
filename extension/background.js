@@ -1,4 +1,4 @@
-// LLM Concurrency Test — CORS Bypass background service worker (MV3).
+// LLM Concurrency Test - Relay background service worker (MV3).
 //
 // host_permissions in manifest.json is "<all_urls>", which lets this SW call
 // fetch() against any origin regardless of CORS. We act purely as a relay:

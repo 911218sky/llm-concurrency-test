@@ -1,4 +1,4 @@
-# LLM Concurrency Test — CORS Bypass
+# LLM Concurrency Test - Relay
 
 A small Chrome extension that lets the [LLM Concurrency Test](../index.html)
 web page reach LLM APIs that don't allow browser-origin (CORS) requests.

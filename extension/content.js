@@ -1,4 +1,4 @@
-// LLM Concurrency Test — CORS Bypass content script.
+// LLM Concurrency Test - Relay content script.
 // Runs at document_start on the configured match patterns.
 //
 // Responsibilities:

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "LLM Concurrency Test — CORS Bypass",
+  "name": "LLM Concurrency Test - Relay",
   "version": "0.1.0",
   "description": "Relays fetch() calls from the LLM Concurrency Test web page through a background service worker so requests can reach APIs that don't allow browser-origin (CORS) requests. The extension is inert on any page that does not explicitly opt in via window.postMessage.",
   "minimum_chrome_version": "102",
