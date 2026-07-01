@@ -375,12 +375,6 @@ function loadField(key) {
 const __llmctFetchRegistry = new Map(); // id → { resolveMeta, stream: ReadableStreamDefaultController, endResolve, error }
 let __llmctFetchNextId = 1;
 
-if (!window.__llmctExtensionBridge) {
-  // Make sure window.__llmctExtensionBridge is defined (falsy) so the page logic
-  // doesn't trip on a missing property check.
-  try { Object.defineProperty(window, '__llmctExtensionBridge', { value: false, writable: false, configurable: false }); } catch (e) {}
-}
-
 window.addEventListener('message', (e) => {
   const d = e.data;
   if (!d || typeof d !== 'object' || !d.type || !d.type.startsWith('llmct:fetch:')) return;
