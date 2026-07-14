@@ -89,6 +89,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
   :root {
+    --content-max: 58rem;
     --bg-page: #fdfbf7;
     --bg-header: #ffffff;
     --bg-panel: #faebd7;
@@ -96,6 +97,7 @@
     --bg-warn: #fff9e6;
     --border-color: #1a1a1a;
     --shadow-color: #1a1a1a;
+    --panel-shadow: rgba(26, 26, 26, 0.14);
     --text: #1a1a1a;
     --text-dim: #4a4a4a;
     --accent-yellow: #ffcf7a;
@@ -106,77 +108,272 @@
     --text-danger: #7f1d1d;
     --fill-warn: #ffe9a8;
     --text-warn: #7c4a03;
+    --accent-red: #d45148;
   }
   html.dark {
-    --bg-page: #15171c;
-    --bg-header: #1b1e24;
-    --bg-panel: #20242c;
-    --bg-input: #262b35;
-    --bg-warn: #2a2410;
-    --border-color: #f5f0e8;
-    --shadow-color: #f5f0e8;
-    --text: #f5f0e8;
-    --text-dim: #b8bcc4;
-    --accent-yellow: #d9a441;
-    --accent-green-btn: #5fd996;
-    --fill-success: #14532d;
-    --text-success: #86efac;
-    --fill-danger: #7f1d1d;
-    --text-danger: #fca5a5;
-    --fill-warn: #78350f;
-    --text-warn: #fde68a;
+    --bg-page: #111416;
+    --bg-header: #171b1e;
+    --bg-panel: #1d2326;
+    --bg-input: #171c1f;
+    --bg-warn: #302a1a;
+    --border-color: #aeb7b2;
+    --shadow-color: #07090a;
+    --panel-shadow: rgba(0, 0, 0, 0.32);
+    --text: #f2f3ee;
+    --text-dim: #aab3b1;
+    --accent-yellow: #c8e45f;
+    --accent-green-btn: #67c996;
+    --fill-success: #173b2a;
+    --text-success: #a8e8bb;
+    --fill-danger: #4a2425;
+    --text-danger: #ffb3aa;
+    --fill-warn: #46371a;
+    --text-warn: #f4d878;
+    --accent-red: #ef796f;
   }
 
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', 'Noto Sans TC', 'Noto Sans SC', system-ui, sans-serif;
     background-color: var(--bg-page);
     color: var(--text);
     transition: background-color 0.15s ease, color 0.15s ease;
+    text-wrap: pretty;
+    line-height: 1.5;
   }
 
-  .neo-border { border: 3px solid var(--border-color); border-radius: 8px; }
-  .neo-shadow { box-shadow: 4px 4px 0px 0px var(--shadow-color); }
-  .neo-input {
+  button, input, select, textarea { font: inherit; }
+  button, a, input, select, textarea { color: var(--text); }
+  a { color: inherit; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--accent-yellow);
+    outline-offset: 3px;
+  }
+  .app-header { min-height: 4.5rem; }
+  .app-main { width: 100%; }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .language-select {
+    min-height: 2.25rem;
+    min-width: 8.25rem;
+    padding: 0.35rem 2rem 0.35rem 0.65rem;
+    appearance: auto;
+    cursor: pointer;
+    background-color: var(--bg-header);
+    background-image: none !important;
+  }
+  .language-select option { background-color: var(--bg-header); color: var(--text); }
+  .language-picker { position: relative; min-width: 8.25rem; }
+  .language-picker summary { display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; min-height: 2.25rem; padding: 0.35rem 0.65rem; cursor: pointer; list-style: none; background: var(--bg-header); }
+  .language-picker summary::-webkit-details-marker { display: none; }
+  .language-picker summary::after { content: ''; width: 0.5rem; height: 0.5rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; color: var(--text-dim); transform: rotate(45deg) translateY(-2px); }
+  .language-picker[open] summary::after { transform: rotate(225deg) translateY(-2px); }
+  .language-picker-options { position: absolute; top: calc(100% + 0.35rem); right: 0; z-index: 30; min-width: 100%; overflow: hidden; border: 2px solid var(--border-color); border-radius: 8px; background: var(--bg-panel); box-shadow: 0 8px 18px var(--panel-shadow); }
+  .language-option { display: block; width: 100%; padding: 0.65rem 0.75rem; border: 0; border-bottom: 1px solid var(--border-color); background: transparent; color: var(--text); cursor: pointer; text-align: left; font-size: 0.82rem; font-weight: 700; white-space: nowrap; }
+  .language-option:last-child { border-bottom: 0; }
+  .language-option:hover, .language-option[aria-selected="true"] { background: var(--accent-yellow); color: var(--text); }
+  .model-details {
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 50;
+    width: min(34rem, 100%);
+    height: 100dvh;
+    margin: 0;
+    border-left: 2px solid var(--border-color);
+    background-color: var(--bg-panel);
+    box-shadow: -12px 0 32px var(--panel-shadow);
+    overflow-y: auto;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .model-details[open] {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .model-details summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.25rem;
+    padding: 1rem 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--bg-panel);
+    border-bottom: 2px solid var(--border-color);
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+  }
+  .model-details summary::-webkit-details-marker { display: none; }
+  .model-details summary::after { content: '×'; color: var(--text-dim); font-size: 1.6rem; line-height: 1; }
+  .model-details summary:hover { background-color: var(--bg-input); }
+  .model-details-body { padding: 1.25rem; }
+  .model-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+  .model-detail-section + .model-detail-section { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); }
+  .model-detail-section-title { margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .model-description { margin: 0 0 1.25rem; color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+  .model-detail-item { min-width: 0; }
+  .model-detail-label { color: var(--text-dim); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .model-detail-value { margin-top: 0.2rem; overflow-wrap: anywhere; font-size: 0.9rem; font-weight: 600; }
+  .model-details-empty { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
+  .model-catalog { margin-top: 1rem; border: 2px solid var(--border-color); border-radius: 10px; background: var(--bg-header); }
+  .model-catalog-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3.25rem; padding: 0.75rem 1rem; cursor: pointer; list-style: none; }
+  .model-catalog-toggle::-webkit-details-marker { display: none; }
+  .model-catalog-toggle:hover { background: var(--bg-input); }
+  .model-catalog-toggle-meta { display: flex; align-items: center; gap: 0.65rem; }
+  .model-catalog-chevron { width: 0.55rem; height: 0.55rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; color: var(--text-dim); transform: rotate(45deg) translateY(-2px); transition: transform 0.15s ease; }
+  .model-catalog[open] .model-catalog-chevron { transform: rotate(225deg) translateY(-2px); }
+  .model-catalog-title { margin: 0; font-size: 0.95rem; font-weight: 800; }
+  .model-catalog-body { padding: 0 1rem 1rem; }
+  .model-catalog-subtitle { margin: 0 0 1rem; color: var(--text-dim); font-size: 0.78rem; }
+  .model-catalog-count { flex: 0 0 auto; padding: 0.3rem 0.55rem; border: 1px solid var(--border-color); border-radius: 999px; color: var(--text-dim); font-size: 0.72rem; font-weight: 800; }
+  .model-catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.75rem; }
+  .model-card { min-width: 0; padding: 1rem; border: 2px solid var(--border-color); border-radius: 10px; background: var(--bg-input); }
+  .model-card.is-selected { border-color: var(--accent-yellow); box-shadow: inset 0 0 0 1px var(--accent-yellow); }
+  .model-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+  .model-card-name { margin: 0; overflow-wrap: anywhere; font-size: 0.95rem; font-weight: 800; }
+  .model-card-id { margin: 0.2rem 0 0; overflow-wrap: anywhere; color: var(--text-dim); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.7rem; }
+  .model-card-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin: 1rem 0; }
+  .model-card-metric { min-width: 0; }
+  .model-card-metric-label { color: var(--text-dim); font-size: 0.67rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+  .model-card-metric-value { margin-top: 0.15rem; overflow-wrap: anywhere; font-size: 0.82rem; font-weight: 700; }
+  .model-capability-list { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.9rem; }
+  .model-capability-chip { padding: 0.25rem 0.45rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-panel); color: var(--text-dim); font-size: 0.68rem; font-weight: 700; }
+  .model-card-details { border-top: 1px solid var(--border-color); }
+  .model-card-details summary { padding: 0.7rem 0; cursor: pointer; color: var(--text); font-size: 0.78rem; font-weight: 800; list-style: none; }
+  .model-card-details summary::-webkit-details-marker { display: none; }
+  .model-card-details summary::after { content: '+'; float: right; color: var(--text-dim); font-size: 1rem; }
+  .model-card-details[open] summary::after { content: '−'; }
+  .model-card-details .model-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-bottom: 0.8rem; }
+  .model-card-action { width: 100%; padding: 0.55rem 0.7rem; border: 2px solid var(--border-color); border-radius: 7px; background: var(--accent-yellow); color: var(--text); font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+  .model-card-action:hover { filter: brightness(0.97); }
+  .model-detail-loading, .model-detail-error { margin: 0 0 0.8rem; color: var(--text-dim); font-size: 0.78rem; line-height: 1.5; }
+  @media (max-width: 640px) { .model-catalog-header { flex-direction: column; } .model-catalog-count { align-self: flex-start; } }
+  .model-picker { position: relative; flex: 0 0 min(18rem, 34%); min-width: 12rem; }
+  .model-picker summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    cursor: pointer;
+    list-style: none;
     background-color: var(--bg-input);
     border: 3px solid var(--border-color);
     border-radius: 6px;
+    font-weight: 700;
+  }
+  .model-picker summary::-webkit-details-marker { display: none; }
+  .model-picker summary::after { content: ''; width: 0.55rem; height: 0.55rem; flex: 0 0 auto; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; color: var(--text-dim); transform: rotate(45deg) translateY(-2px); }
+  .model-picker[open] summary { border-radius: 6px 6px 0 0; }
+  .model-picker[open] summary::after { transform: rotate(225deg) translateY(-2px); }
+  .model-picker-options {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% - 3px);
+    left: 0;
+    right: 0;
+    max-height: 18rem;
+    overflow-y: auto;
+    border: 3px solid var(--border-color);
+    background-color: var(--bg-panel);
+    box-shadow: 5px 5px 0 var(--shadow-color);
+  }
+  .model-option {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 0;
+    border-bottom: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .model-option:last-child { border-bottom: 0; }
+  .model-option:hover, .model-option[aria-selected="true"] { background-color: var(--accent-yellow); color: var(--text); }
+  html.dark .model-picker summary { border-color: #68756f; background-color: #1b2224; }
+  html.dark .model-picker-options { border-color: #68756f; background-color: #1b2224; box-shadow: 5px 5px 0 #080b0c; }
+  html.dark .model-option { border-bottom-color: #3f4b47; color: #e5ebe7; }
+  html.dark .model-option:hover { background-color: #293733; color: #f2f3ee; }
+  html.dark .model-option[aria-selected="true"] { background-color: #3b4b3b; color: #e7f1bf; }
+  @media (max-width: 640px) { .model-picker { flex-basis: 100%; min-width: 0; } }
+
+  .neo-border { border: 2px solid var(--border-color); border-radius: 8px; transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease; }
+  .neo-shadow { box-shadow: 0 6px 0 var(--shadow-color); }
+  .neo-input {
+    background-color: var(--bg-input) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 8px;
     padding: 0.75rem;
     font-weight: 500;
-    color: var(--text);
-    transition: all 0.2s ease;
+    color: var(--text) !important;
+    -webkit-text-fill-color: var(--text);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
-  .neo-input::placeholder { color: var(--text-dim); opacity: 0.75; font-weight: 400; }
-  .neo-input:focus { outline: none; box-shadow: 2px 2px 0px 0px var(--shadow-color); }
+  .neo-input::placeholder { color: var(--text-dim) !important; opacity: 0.75; font-weight: 400; -webkit-text-fill-color: var(--text-dim); }
+  html.dark input.neo-input, html.dark textarea.neo-input, html.dark select.neo-input {
+    background-color: var(--bg-input) !important;
+    color: var(--text) !important;
+    border-color: var(--border-color) !important;
+    -webkit-text-fill-color: var(--text);
+  }
+  html.dark input.neo-input::placeholder, html.dark textarea.neo-input::placeholder {
+    color: var(--text-dim) !important;
+    -webkit-text-fill-color: var(--text-dim);
+  }
+  html.dark select.neo-input option { background-color: var(--bg-panel); color: var(--text); }
+  html.dark input[type="number"]::-webkit-inner-spin-button { filter: invert(0.85); }
+  .neo-input:focus { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-yellow) 70%, transparent); }
   .neo-button {
     background-color: var(--accent-yellow);
-    border: 3px solid var(--border-color);
-    border-radius: 6px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
     font-weight: 700;
     padding: 0.75rem 1.5rem;
     cursor: pointer;
-    box-shadow: 4px 4px 0px 0px var(--shadow-color);
-    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 0 var(--shadow-color);
+    transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s ease;
     color: var(--text);
   }
-  .neo-button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px 0px var(--shadow-color); }
-  .neo-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 4px 4px 0px 0px var(--shadow-color); }
+  .neo-button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 0 var(--shadow-color); }
+  .neo-button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--shadow-color); }
+  .neo-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 0 var(--shadow-color); }
   .neo-button-green { background-color: var(--accent-green-btn); }
   .neo-panel {
     background-color: var(--bg-panel);
-    border: 4px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: 8px 8px 0px 0px var(--shadow-color);
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: 0 12px 28px var(--panel-shadow);
   }
   .label-text { font-size: 0.875rem; font-weight: 600; color: var(--text-dim); margin-bottom: 0.25rem; display: block; }
-  .sparkle { position: absolute; width: 40px; height: 40px; }
+  .sparkle { position: absolute; width: 40px; height: 40px; stroke: var(--border-color); }
 
-  .stat-box { background-color: var(--bg-header); border: 3px solid var(--border-color); border-radius: 8px; padding: 1rem; }
+  .stat-box { background-color: var(--bg-header); border: 2px solid var(--border-color); border-radius: 10px; padding: 1rem; }
   .stat-box .v { font-size: 1.4rem; font-weight: 800; }
   .stat-box .l { font-size: 0.7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
-  .verdict-box { border: 3px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
+  .verdict-box { border: 2px solid var(--border-color); border-radius: 10px; padding: 1rem 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
   .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--border-color); }
 
-  .track { background-color: var(--bg-input); border: 2px solid var(--border-color); border-radius: 5px; height: 20px; position: relative; overflow: hidden; }
+  .track { background-color: var(--bg-input); border: 2px solid var(--border-color); border-radius: 6px; height: 20px; position: relative; overflow: hidden; }
   .bar { position: absolute; top: 0; bottom: 0; }
 
   .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -186,49 +383,82 @@
 
   .empty-state { color: var(--text-dim); padding: 2rem 0; text-align: center; font-weight: 500; }
 
-  .provider-toggle { display: inline-flex; border: 3px solid var(--border-color); border-radius: 6px; overflow: hidden; }
-  .provider-btn { padding: 0.6rem 1.1rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; background-color: var(--bg-header); color: var(--text); }
-  .provider-btn + .provider-btn { border-left: 3px solid var(--border-color); }
+  .provider-toggle { display: flex; width: fit-content; max-width: 100%; border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; background-color: var(--bg-header); }
+  .provider-btn { padding: 0.65rem 1rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; background-color: transparent; color: var(--text); }
+  .provider-btn + .provider-btn { border-left: 2px solid var(--border-color); }
   .provider-btn.active { background-color: var(--accent-yellow); }
+  html.dark .provider-btn.active { background-color: #3b4b3b; color: #e7f1bf; }
+  .provider-btn:hover:not(.active), .neo-border:hover:not(button) { background-color: var(--bg-input) !important; }
+  .provider-btn:active { transform: translateY(1px); }
+  .provider-btn:focus-visible { outline: 0; box-shadow: inset 0 0 0 3px var(--accent-yellow); }
+  .model-option { transition: background-color 0.12s ease, color 0.12s ease; }
+  .data-table-wrap { overflow-x: auto; border: 2px solid var(--border-color); border-radius: 10px; background-color: var(--bg-panel); }
+  .data-table { min-width: 52rem; }
+  .data-table th { white-space: nowrap; }
+  .section-kicker { display: flex; align-items: center; gap: 0.5rem; }
+  .section-kicker::before { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--accent-yellow); border: 1px solid var(--border-color); }
+  @media (max-width: 640px) {
+    .model-details { width: 100%; }
+    .provider-toggle { width: 100%; }
+    .provider-btn { flex: 1; padding-inline: 0.5rem; }
+  }
 
   .validation-msg { font-size: 0.8rem; font-weight: 600; color: var(--text-danger); }
+  .data-table td, .stat-box .v { font-variant-numeric: tabular-nums; }
+  html.dark .text-red-500, html.dark .text-red-400 { color: var(--accent-red) !important; }
+  @media (max-width: 640px) {
+    .app-header { align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; }
+    .app-header > div:last-child { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+    .language-select { min-width: 7.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
 </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-<header class="flex items-center justify-between px-8 py-4 border-b-[3px]" style="background-color: var(--bg-header); border-color: var(--border-color);">
+<header class="app-header flex items-center justify-between px-8 py-4 border-b-[3px]" style="background-color: var(--bg-header); border-color: var(--border-color);">
   <div class="flex items-center gap-4">
     <h1 class="text-xl font-bold tracking-tight">LLM<span class="text-red-500">Test</span></h1>
   </div>
   <div class="flex items-center gap-2">
-  <a id="githubLink" href="https://github.com/0xAungkon/llm-concurrency-test" target="_blank" rel="noopener" class="neo-border flex items-center gap-2 px-3 py-1.5 text-sm font-semibold" style="background-color: var(--bg-header); text-decoration: none;">
+  <a id="githubLink" href="https://github.com/911218sky/llm-concurrency-test" target="_blank" rel="noopener" class="neo-border flex items-center gap-2 px-3 py-1.5 text-sm font-semibold" style="background-color: var(--bg-header); text-decoration: none;">
     <svg fill="currentColor" height="14" viewBox="0 0 24 24" width="14" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.92.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.94 10.94 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.41-5.27 5.69.41.35.78 1.05.78 2.12 0 1.53-.01 2.77-.01 3.14 0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"></path></svg>
-    <span>GitHub</span>
+    <span data-i18n="github">GitHub</span>
   </a>
-  <button id="themeToggle" class="neo-border flex items-center gap-2 px-3 py-1.5 text-sm font-semibold" style="background-color: var(--bg-header);" onclick="toggleTheme()">
+  <button id="themeToggle" class="neo-border flex items-center gap-2 px-3 py-1.5 text-sm font-semibold" style="background-color: var(--bg-header);" onclick="toggleTheme()" type="button" aria-pressed="false">
     <svg id="iconMoon" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
     <svg id="iconSun" class="hidden" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
-    <span id="themeLabel">Dark mode</span>
+    <span id="themeLabel" data-i18n="themeDark">Dark mode</span>
   </button>
+  <span class="sr-only" id="languageLabel" data-i18n="language">Language</span>
+  <details id="languagePicker" class="language-picker neo-border" aria-labelledby="languageLabel">
+    <summary><span id="languagePickerLabel">English</span></summary>
+    <div class="language-picker-options" role="listbox" aria-label="Language">
+      <button type="button" class="language-option" data-language="zh-Hant" role="option" aria-selected="false">繁體中文</button>
+      <button type="button" class="language-option" data-language="zh-Hans" role="option" aria-selected="false">简体中文</button>
+      <button type="button" class="language-option" data-language="en" role="option" aria-selected="true">English</button>
+    </div>
+  </details>
   </div>
 </header>
 
-<main class="flex-grow flex flex-col items-center justify-start pt-12 pb-24 px-4 relative overflow-hidden">
+<main class="app-main flex-grow flex flex-col items-center justify-start pt-12 pb-24 px-4 relative overflow-hidden">
 
-  <svg class="sparkle top-20 left-32 text-red-400" fill="currentColor" stroke="black" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6H22l-6.2 4.5 2.4 7.6-6.2-4.5-6.2 4.5 2.4-7.6L2 9.6h7.6z"></path></svg>
   <svg class="sparkle top-40 right-40 text-green-400" fill="currentColor" stroke="black" stroke-width="2" style="width: 30px; height: 30px; transform: rotate(15deg);" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6H22l-6.2 4.5 2.4 7.6-6.2-4.5-6.2 4.5 2.4-7.6L2 9.6h7.6z"></path></svg>
 
   <div class="text-center max-w-2xl mb-8 relative z-10">
-    <div class="text-xs font-bold uppercase tracking-widest mb-2" style="color: var(--text-dim);">LLM API • LOAD TEST • CLIENT-SIDE</div>
-    <h2 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4 tracking-tight">LLM Concurrency <br/> Test</h2>
+    <div class="text-xs font-bold uppercase tracking-widest mb-2" style="color: var(--text-dim);" data-i18n="eyebrow">LLM API • LOAD TEST • CLIENT-SIDE</div>
+    <h2 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4 tracking-tight"><span data-i18n="heroTitleLine1">LLM Concurrency</span><br/><span data-i18n="heroTitleLine2">Test</span></h2>
     <p class="text-lg font-medium px-4" style="color: var(--text-dim);">
-      Fires N simultaneous requests and measures whether they run in parallel. Local mode automatically relays API calls through this machine to avoid browser CORS failures.
+      <span data-i18n="heroDescription">Fires N simultaneous requests and measures whether they run in parallel. Local mode automatically relays API calls through this machine to avoid browser CORS failures.</span>
     </p>
   </div>
 
   <div class="max-w-4xl w-full mb-4 relative z-10">
     <div class="neo-border p-4 text-sm font-medium leading-relaxed" style="background-color: var(--bg-warn);">
-      Your API key stays in this browser. On the local deployment, requests go through the local relay automatically, so providers do not need browser CORS support. Fill in the API key and endpoint, then leave the field to load available models automatically.
+      <span data-i18n="securityNotice">Your API key stays in this browser. On the local deployment, requests go through the local relay automatically, so providers do not need browser CORS support. Fill in the API key and endpoint, then leave the field to load available models automatically.</span>
     </div>
   </div>
 
@@ -236,100 +466,122 @@
     <div class="neo-border p-4 text-sm font-medium leading-relaxed flex items-start gap-3" style="background-color: var(--bg-input);">
       <span style="font-size: 1.1rem;">⚠️</span>
       <div>
-        <div class="font-bold mb-1">Requests blocked by CORS?</div>
-        <div>If your API provider doesn't allow browser-origin requests, install the
+        <div class="font-bold mb-1" data-i18n="corsTitle">Requests blocked by CORS?</div>
+        <div><span data-i18n="corsBodyBefore">If your API provider doesn't allow browser-origin requests, install the</span>
           <a id="corsExtLink" href="https://github.com/aungkon/llmct-extension" target="_blank" rel="noopener" class="underline font-bold">LLM Concurrency Test - Relay Chrome extension</a>
-          and reload this page. It relays your requests through a background service worker so the browser's same-origin policy no longer applies.
+          <span data-i18n="corsBodyAfter">and reload this page. It relays your requests through a background service worker so the browser's same-origin policy no longer applies.</span>
         </div>
       </div>
     </div>
   </div>
 
   <div class="neo-panel w-full max-w-4xl p-8 relative z-10">
-    <h3 class="text-sm font-bold uppercase tracking-wider mb-6 pb-2" style="color: var(--text-dim); border-bottom: 2px solid var(--text-dim);">Test Configuration</h3>
+    <h3 class="text-sm font-bold uppercase tracking-wider mb-6 pb-2" style="color: var(--text-dim); border-bottom: 2px solid var(--text-dim);" data-i18n="configuration">Test Configuration</h3>
     <div class="space-y-6">
 
       <div>
-        <label class="label-text">PROVIDER</label>
+        <label class="label-text" data-i18n="provider">PROVIDER</label>
         <div class="provider-toggle">
-          <button type="button" class="provider-btn active" id="providerBtnOpenai" onclick="setProvider('openai')">OpenAI-compatible</button>
-          <button type="button" class="provider-btn" id="providerBtnAnthropic" onclick="setProvider('anthropic')">Anthropic</button>
+          <button type="button" class="provider-btn active" id="providerBtnOpenai" onclick="setProvider('openai')" data-i18n="openaiCompatible">OpenAI-compatible</button>
+          <button type="button" class="provider-btn" id="providerBtnAnthropic" onclick="setProvider('anthropic')" data-i18n="anthropic">Anthropic</button>
+          <button type="button" class="provider-btn" id="providerBtnGemini" onclick="setProvider('gemini')" data-i18n="gemini">Gemini</button>
         </div>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label class="label-text">API KEY</label>
-          <input id="apiKey" class="neo-input w-full" type="password" value="" placeholder="sk-... or your provider's API key" autocomplete="off"/>
+          <label class="label-text" for="apiKey" data-i18n="apiKey">API KEY</label>
+          <input id="apiKey" class="neo-input w-full" type="password" value="" data-i18n-placeholder="apiKeyPlaceholder" placeholder="sk-... or your provider's API key" autocomplete="off"/>
         </div>
         <div>
-          <label class="label-text">ENDPOINT URL</label>
-          <input id="endpoint" class="neo-input w-full" type="text" value="" placeholder="Base URL or full endpoint, e.g. https://api.openai.com/v1"/>
-          <div class="text-xs mt-1" style="color: var(--text-dim);">Base URL is auto-resolved to the full endpoint on blur (OpenAI → <code>/chat/completions</code>, Anthropic → <code>/v1/messages</code>). A full URL you already pasted is left untouched.</div>
+          <label class="label-text" for="endpoint" data-i18n="endpoint">ENDPOINT URL</label>
+          <input id="endpoint" class="neo-input w-full" type="text" value="" data-i18n-placeholder="endpointPlaceholder" placeholder="Base URL or full endpoint, e.g. https://api.openai.com/v1"/>
+          <div class="text-xs mt-1" style="color: var(--text-dim);" data-i18n="endpointHint">Base URL is auto-resolved to the full endpoint on blur (OpenAI → /chat/completions, Anthropic → /v1/messages). A full URL you already pasted is left untouched.</div>
         </div>
         <div>
           <div class="flex items-center justify-between mb-1">
-            <label class="label-text" style="margin-bottom: 0;">MODEL</label>
-            <button type="button" id="fetchModelsBtn" class="text-xs font-bold px-2 py-1 neo-border" style="background-color: var(--bg-header);" onclick="fetchModels()">Fetch models</button>
+            <label class="label-text" for="model" style="margin-bottom: 0;" data-i18n="model">MODEL</label>
+            <button type="button" id="fetchModelsBtn" class="text-xs font-bold px-2 py-1 neo-border" style="background-color: var(--bg-header);" onclick="fetchModels()" data-i18n="fetchModels">Fetch models</button>
           </div>
           <div class="flex gap-2">
-            <input id="model" class="neo-input flex-1" type="text" value="" placeholder="e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash"/>
-            <select id="modelSelect" class="neo-input" style="display: none; max-width: 12rem;" onchange="if(this.value){document.getElementById('model').value=this.value;this.value='';}">
-              <option value="">Pick a model…</option>
-            </select>
+            <input id="model" class="neo-input flex-1" type="text" value="" data-i18n-placeholder="modelPlaceholder" placeholder="e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash"/>
+            <details id="modelPicker" class="model-picker hidden">
+              <summary><span id="modelPickerLabel" data-i18n="pickModel">Pick a model…</span><span id="modelPickerCount"></span></summary>
+              <div id="modelPickerOptions" class="model-picker-options" role="listbox" aria-label="Models"></div>
+            </details>
           </div>
           <div id="modelsStatus" class="text-xs mt-1" style="color: var(--text-dim);"></div>
+          <details id="modelCatalogView" class="model-catalog hidden" aria-live="polite">
+            <summary class="model-catalog-toggle">
+              <span class="model-catalog-title" data-i18n="modelCatalog">Model catalog</span>
+              <span class="model-catalog-toggle-meta"><span id="modelCatalogCount" class="model-catalog-count"></span><span class="model-catalog-chevron" aria-hidden="true"></span></span>
+            </summary>
+            <div class="model-catalog-body">
+              <p class="model-catalog-subtitle" data-i18n="modelCatalogHint">Browse limits and capabilities before choosing a model.</p>
+              <div id="modelCatalogGrid" class="model-catalog-grid"></div>
+            </div>
+          </details>
         </div>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
-          <label class="label-text">CONCURRENCY</label>
+          <label class="label-text" for="concurrency" data-i18n="concurrency">CONCURRENCY</label>
           <input id="concurrency" class="neo-input w-full" type="number" value="5" min="1" max="50"/>
         </div>
         <div>
-          <label class="label-text">MAX TOKENS</label>
+          <label class="label-text" for="maxTokens" data-i18n="maxTokens">MAX TOKENS</label>
           <input id="maxTokens" class="neo-input w-full" type="number" value="200" min="1" max="4000"/>
         </div>
         <div>
-          <label class="label-text">TIMEOUT (S)</label>
+          <label class="label-text" for="timeout" data-i18n="timeout">TIMEOUT (S)</label>
           <input id="timeout" class="neo-input w-full" type="number" value="60" min="1" max="300"/>
         </div>
         <div>
-          <label class="label-text">TEMPERATURE</label>
+          <label class="label-text" for="temperature" data-i18n="temperature">TEMPERATURE</label>
           <input id="temperature" class="neo-input w-full" step="0.1" type="number" value="1" min="0" max="2"/>
         </div>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
-          <label class="label-text">TOP P</label>
+          <label class="label-text" for="topP" data-i18n="topP">TOP P</label>
           <input id="topP" class="neo-input w-full" step="0.1" type="number" value="1" min="0" max="1"/>
+        </div>
+        <div>
+          <label class="label-text" for="thinkingStrength" data-i18n="thinkingStrength">THINKING STRENGTH</label>
+          <select id="thinkingStrength" class="neo-input w-full">
+            <option value="off" data-i18n="thinkingOff">Off</option>
+            <option value="low" data-i18n="thinkingLow">Low</option>
+            <option value="medium" selected data-i18n="thinkingMedium">Medium</option>
+            <option value="high" data-i18n="thinkingHigh">High</option>
+          </select>
+          <div class="text-xs mt-1" style="color: var(--text-dim);" data-i18n="thinkingHint">Mapped to each provider's native reasoning or thinking setting.</div>
         </div>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label class="label-text">SYSTEM PROMPT</label>
+          <label class="label-text" for="systemPrompt" data-i18n="systemPrompt">SYSTEM PROMPT</label>
           <textarea id="systemPrompt" class="neo-input w-full resize-y h-24">You are a helpful assistant.</textarea>
         </div>
         <div>
-          <label class="label-text">USER MESSAGE</label>
+          <label class="label-text" for="prompt" data-i18n="userMessage">USER MESSAGE</label>
           <textarea id="prompt" class="neo-input w-full resize-y h-24">hi</textarea>
         </div>
       </div>
 
       <div class="pt-2 flex flex-col md:flex-row justify-between items-center gap-4">
         <button id="runBtn" class="neo-button neo-button-green text-lg px-8 py-3 w-full md:w-auto text-center flex justify-center items-center gap-2" type="button" onclick="runTest()">
-          <span id="runLabel">RUN TEST</span>
+          <span id="runLabel" data-i18n="runTest">RUN TEST</span>
           <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
         </button>
         <div class="flex gap-2 w-full md:w-auto">
-          <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('light')">Light load</button>
-          <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('heavy')">Heavy load</button>
+          <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('light')" data-i18n="lightLoad">Light load</button>
+          <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('heavy')" data-i18n="heavyLoad">Heavy load</button>
         </div>
       </div>
-      <div id="validationMsg" class="validation-msg hidden">Fill in API key, endpoint, and model before running a test.</div>
+      <div id="validationMsg" class="validation-msg hidden" data-i18n="validation">Fill in API key, endpoint, and model before running a test.</div>
 
     </div>
   </div>
@@ -341,12 +593,138 @@
 
 <script>
 window.__llmctLocalRelay = false;
+/* ---------- Language ---------- */
+const I18N = {
+  en: {
+    pageTitle: 'LLMTest | Chat-completion API concurrency tester',
+    metaDescription: 'Test chat-completion API concurrency from the browser with streaming TTFT, live timelines, and local CORS relay support.',
+    github: 'GitHub', language: 'Language', themeDark: 'Dark mode', themeLight: 'Light mode',
+    eyebrow: 'LLM API • LOAD TEST • CLIENT-SIDE', heroTitleLine1: 'LLM Concurrency', heroTitleLine2: 'Test',
+    heroDescription: 'Fires N simultaneous requests and measures whether they run in parallel. Local mode automatically relays API calls through this machine to avoid browser CORS failures.',
+    securityNotice: 'Your API key stays in this browser. On the local deployment, requests go through the local relay automatically, so providers do not need browser CORS support. Fill in the API key and endpoint, then leave the field to load available models automatically.',
+    corsTitle: 'Requests blocked by CORS?', corsBodyBefore: "If your API provider does not allow browser-origin requests, install the", corsBodyAfter: 'and reload this page. It relays your requests through a background service worker so the browser same-origin policy no longer applies.',
+    configuration: 'Test configuration', provider: 'Provider', openaiCompatible: 'OpenAI-compatible', anthropic: 'Anthropic', gemini: 'Gemini',
+    apiKey: 'API key', apiKeyPlaceholder: "sk-... or your provider's API key", endpoint: 'Endpoint URL', endpointPlaceholder: 'Base URL or full endpoint, e.g. https://api.openai.com/v1',
+    endpointHint: 'Base URL is resolved when you leave the field (OpenAI → /chat/completions, Anthropic → /v1/messages, Gemini → /v1beta). A full URL you pasted is left untouched.',
+    model: 'Model', fetchModels: 'Fetch models', fetching: 'Fetching…', modelPlaceholder: 'e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: 'Pick a model…', modelDetailsTitle: 'Model details', modelCatalog: 'Model catalog', modelCatalogHint: 'Browse limits and capabilities before choosing a model.', modelCount: '{count} models', viewDetails: 'Show details', useModel: 'Use this model', capabilitiesNotProvided: 'Capabilities not provided', modelBasics: 'Model information', modelDescription: 'Description', baseModel: 'Base model', version: 'Version',
+    contextWindow: 'Context window', maxOutput: 'Max output tokens', inputPrice: 'Input price', outputPrice: 'Output price', owner: 'Owner', created: 'Created', capabilities: 'Capabilities', modalities: 'Modalities', modality: 'Modality', tokenizer: 'Tokenizer', knowledgeCutoff: 'Knowledge cutoff', expirationDate: 'Expiration date', supportedParameters: 'Supported parameters', thinkingSupport: 'Thinking / reasoning', imageInput: 'Image input', audioInput: 'Audio input', videoInput: 'Video input', toolCalling: 'Tool calling', structuredOutput: 'Structured output', streaming: 'Streaming', supported: 'Supported', notSupported: 'Not supported', modelDetailsEmpty: 'This provider returned the model name but no additional metadata.', loadingDetails: 'Loading details from the provider…', detailsUnavailable: 'The provider did not expose a separate detail response.', providerNotProvided: 'Not provided by provider', perMillionTokens: '/ 1M tokens',
+    concurrency: 'Concurrency', maxTokens: 'Max tokens', timeout: 'Timeout (s)', temperature: 'Temperature', topP: 'Top P', thinkingStrength: 'Thinking strength', thinkingOff: 'Off', thinkingLow: 'Low', thinkingMedium: 'Medium', thinkingHigh: 'High', thinkingHint: "Mapped to each provider's native reasoning or thinking setting.", systemPrompt: 'System prompt', userMessage: 'User message',
+    runTest: 'Run test', runRunning: 'Running…', lightLoad: 'Light load', heavyLoad: 'Heavy load', validation: 'Fill in API key, endpoint, and model before running a test.',
+    setCredentials: 'Set API key and endpoint first.', modelsRequest: 'Loading models from {url}', pickModelCount: 'Pick a model… ({count})', modelsLoadedOne: '1 model loaded.', modelsLoadedMany: '{count} models loaded.',
+    invalidCredentials: 'The API key is invalid or cannot access the model list.', modelsNotFound: 'The /v1/models endpoint was not found. Check that this is an OpenAI-compatible base URL.', apiUnavailable: 'The API could not be reached. Check the URL, VPN, or local relay.', failed: 'Failed: {message}',
+    wallTime: 'Wall time', successful: 'Successful', totalTokens: 'Total tokens', aggregateTokens: 'Aggregate tokens/sec', overlapRatio: 'Overlap ratio',
+    running: 'Running…', completed: '{done} / {total} completed', downloadJson: 'Download JSON', downloadCsv: 'Download CSV', copySummary: 'Copy summary',
+    timeline: 'Timeline', runningRange: '(0s → running)', started: 'Started: {time}', startedFinished: 'Started: {start} · Finished: {end}', perRequest: 'Per-request detail',
+    tableStart: 'Start', tableEnd: 'End', tableDuration: 'Duration', tableTtft: 'TTFT', tableTokens: 'Tokens', tableTokSec: 'Tok/sec', tableStatus: 'Status', tableNote: 'Note',
+    statusSuccess: 'success', statusTimeout: 'timeout', statusException: 'exception', statusError: 'error', streamNote: 'stream={status}', copied: 'Copied', copyFailed: 'Copy failed',
+    verdictInconclusive: 'Inconclusive — need 2+ successful requests', verdictConcurrent: 'Concurrent — requests processed in parallel', verdictSequential: 'Sequential — requests queued one at a time', verdictPartial: 'Partial concurrency — limited parallelism',
+    corsLikely: 'likely CORS — the API blocked this browser origin'
+  },
+  'zh-Hant': {
+    pageTitle: 'LLMTest｜聊天完成 API 並發測試工具',
+    metaDescription: '在瀏覽器測試聊天完成 API 的並發能力，提供串流 TTFT、即時時間軸與本機 CORS relay。',
+    github: 'GitHub', language: '語言', themeDark: '深色模式', themeLight: '淺色模式',
+    eyebrow: 'LLM API • 負載測試 • 用戶端', heroTitleLine1: 'LLM 並發', heroTitleLine2: '測試',
+    heroDescription: '同時發送 N 個請求，測量它們是否平行執行。本機模式會自動透過這台機器轉送 API 請求，避免瀏覽器 CORS 錯誤。',
+    securityNotice: 'API 金鑰只會留在這個瀏覽器。本機部署會自動透過本機 relay 發送請求，因此服務商不需要支援瀏覽器 CORS。填入 API 金鑰與端點，離開欄位後會自動載入可用模型。',
+    corsTitle: '請求被 CORS 阻擋了嗎？', corsBodyBefore: '如果 API 服務商不允許瀏覽器來源請求，請安裝', corsBodyAfter: '並重新載入頁面。它會透過背景 service worker 轉送請求，避開瀏覽器同源政策。',
+    configuration: '測試設定', provider: '服務商', openaiCompatible: 'OpenAI 相容', anthropic: 'Anthropic', gemini: 'Gemini',
+    apiKey: 'API 金鑰', apiKeyPlaceholder: 'sk-... 或服務商提供的 API 金鑰', endpoint: '端點 URL', endpointPlaceholder: 'Base URL 或完整端點，例如 https://api.openai.com/v1',
+    endpointHint: '離開欄位時會補成服務商端點（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已貼上的完整 URL 會保持不變。',
+    model: '模型', fetchModels: '取得模型', fetching: '取得中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '選擇模型…', modelDetailsTitle: '模型詳細資訊', modelCatalog: '模型總覽', modelCatalogHint: '先比較限制與支援能力，再選擇要測試的模型。', modelCount: '共 {count} 個模型', viewDetails: '顯示詳細資料', useModel: '使用此模型', capabilitiesNotProvided: '服務商未提供能力資料', modelBasics: '模型資訊', modelDescription: '模型描述', baseModel: '基礎模型', version: '版本',
+    contextWindow: '最大上下文', maxOutput: '最大輸出 Token', inputPrice: '輸入價格', outputPrice: '輸出價格', owner: '擁有者', created: '建立時間', capabilities: '支援能力', modalities: '支援模態', modality: '模態', tokenizer: 'Tokenizer', knowledgeCutoff: '知識截止日期', expirationDate: '到期日期', supportedParameters: '支援參數', thinkingSupport: '思考／推理', imageInput: '圖片輸入', audioInput: '音訊輸入', videoInput: '影片輸入', toolCalling: '工具呼叫', structuredOutput: '結構化輸出', streaming: '串流輸出', supported: '支援', notSupported: '不支援', modelDetailsEmpty: '服務商只回傳了模型名稱，沒有提供其他中繼資料。', loadingDetails: '正在向服務商載入詳細資料…', detailsUnavailable: '服務商沒有提供獨立的模型詳細資料。', providerNotProvided: '服務商未提供', perMillionTokens: '／每 100 萬 Token',
+    concurrency: '並發數', maxTokens: '最大 Token 數', timeout: '逾時（秒）', temperature: 'Temperature', topP: 'Top P', thinkingStrength: '思考強度', thinkingOff: '關閉', thinkingLow: '低', thinkingMedium: '中', thinkingHigh: '高', thinkingHint: '會轉換成各服務商原生的推理或思考設定。', systemPrompt: '系統提示詞', userMessage: '使用者訊息',
+    runTest: '開始測試', runRunning: '測試中…', lightLoad: '輕量負載', heavyLoad: '重度負載', validation: '開始測試前，請填入 API 金鑰、端點與模型。',
+    setCredentials: '請先填入 API 金鑰與端點。', modelsRequest: '正在從 {url} 載入模型', pickModelCount: '選擇模型…（{count}）', modelsLoadedOne: '已載入 1 個模型。', modelsLoadedMany: '已載入 {count} 個模型。',
+    invalidCredentials: 'API 金鑰無效，或沒有取得模型列表的權限。', modelsNotFound: '找不到 /v1/models，請確認這是 OpenAI 相容的 Base URL。', apiUnavailable: '無法連線到 API，請確認 URL、VPN 或本機 relay。', failed: '失敗：{message}',
+    wallTime: '總耗時', successful: '成功數', totalTokens: '總 Token 數', aggregateTokens: '總 Token／秒', overlapRatio: '重疊比例',
+    running: '測試中…', completed: '已完成 {done} / {total}', downloadJson: '下載 JSON', downloadCsv: '下載 CSV', copySummary: '複製摘要',
+    timeline: '時間軸', runningRange: '（0 秒 → 測試中）', started: '開始：{time}', startedFinished: '開始：{start} · 結束：{end}', perRequest: '單次請求明細',
+    tableStart: '開始', tableEnd: '結束', tableDuration: '耗時', tableTtft: 'TTFT', tableTokens: 'Token', tableTokSec: 'Token／秒', tableStatus: '狀態', tableNote: '備註',
+    statusSuccess: '成功', statusTimeout: '逾時', statusException: '例外', statusError: '錯誤', streamNote: '串流={status}', copied: '已複製', copyFailed: '複製失敗',
+    verdictInconclusive: '無法判定，需要至少 2 次成功請求', verdictConcurrent: '並發，請求正在平行處理', verdictSequential: '循序，請求逐一排隊處理', verdictPartial: '部分並發，平行處理能力受限',
+    corsLikely: '可能是 CORS，API 阻擋了此瀏覽器來源'
+  },
+  'zh-Hans': {
+    pageTitle: 'LLMTest｜聊天完成 API 并发测试工具',
+    metaDescription: '在浏览器测试聊天完成 API 的并发能力，提供流式 TTFT、实时时间轴与本机 CORS relay。',
+    github: 'GitHub', language: '语言', themeDark: '深色模式', themeLight: '浅色模式',
+    eyebrow: 'LLM API • 负载测试 • 客户端', heroTitleLine1: 'LLM 并发', heroTitleLine2: '测试',
+    heroDescription: '同时发送 N 个请求，测量它们是否并行执行。本机模式会自动通过这台机器转发 API 请求，避免浏览器 CORS 错误。',
+    securityNotice: 'API 密钥只会保留在这个浏览器。本机部署会自动通过本机 relay 发送请求，因此服务商不需要支持浏览器 CORS。填入 API 密钥和端点，离开字段后会自动加载可用模型。',
+    corsTitle: '请求被 CORS 阻止了吗？', corsBodyBefore: '如果 API 服务商不允许浏览器来源请求，请安装', corsBodyAfter: '并重新加载页面。它会通过后台 service worker 转发请求，避开浏览器同源策略。',
+    configuration: '测试设置', provider: '服务商', openaiCompatible: 'OpenAI 兼容', anthropic: 'Anthropic', gemini: 'Gemini',
+    apiKey: 'API 密钥', apiKeyPlaceholder: 'sk-... 或服务商提供的 API 密钥', endpoint: '端点 URL', endpointPlaceholder: 'Base URL 或完整端点，例如 https://api.openai.com/v1',
+    endpointHint: '离开字段时会补成服务商端点（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已粘贴的完整 URL 会保持不变。',
+    model: '模型', fetchModels: '获取模型', fetching: '获取中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '选择模型…', modelDetailsTitle: '模型详细信息', modelCatalog: '模型总览', modelCatalogHint: '先比较限制和支持能力，再选择要测试的模型。', modelCount: '共 {count} 个模型', viewDetails: '显示详细信息', useModel: '使用此模型', capabilitiesNotProvided: '服务商未提供能力资料', modelBasics: '模型信息', modelDescription: '模型描述', baseModel: '基础模型', version: '版本',
+    contextWindow: '最大上下文', maxOutput: '最大输出 Token', inputPrice: '输入价格', outputPrice: '输出价格', owner: '所有者', created: '创建时间', capabilities: '支持能力', modalities: '支持模态', modality: '模态', tokenizer: 'Tokenizer', knowledgeCutoff: '知识截止日期', expirationDate: '到期日期', supportedParameters: '支持参数', thinkingSupport: '思考／推理', imageInput: '图片输入', audioInput: '音频输入', videoInput: '视频输入', toolCalling: '工具调用', structuredOutput: '结构化输出', streaming: '流式输出', supported: '支持', notSupported: '不支持', modelDetailsEmpty: '服务商只返回了模型名称，没有提供其他元数据。', loadingDetails: '正在向服务商加载详细信息…', detailsUnavailable: '服务商没有提供独立的模型详细信息。', providerNotProvided: '服务商未提供', perMillionTokens: '／每 100 万 Token',
+    concurrency: '并发数', maxTokens: '最大 Token 数', timeout: '超时（秒）', temperature: 'Temperature', topP: 'Top P', thinkingStrength: '思考强度', thinkingOff: '关闭', thinkingLow: '低', thinkingMedium: '中', thinkingHigh: '高', thinkingHint: '会转换成各服务商原生的推理或思考设置。', systemPrompt: '系统提示词', userMessage: '用户消息',
+    runTest: '开始测试', runRunning: '测试中…', lightLoad: '轻量负载', heavyLoad: '重度负载', validation: '开始测试前，请填入 API 密钥、端点和模型。',
+    setCredentials: '请先填入 API 密钥和端点。', modelsRequest: '正在从 {url} 加载模型', pickModelCount: '选择模型…（{count}）', modelsLoadedOne: '已加载 1 个模型。', modelsLoadedMany: '已加载 {count} 个模型。',
+    invalidCredentials: 'API 密钥无效，或没有获取模型列表的权限。', modelsNotFound: '找不到 /v1/models，请确认这是 OpenAI 兼容的 Base URL。', apiUnavailable: '无法连接到 API，请确认 URL、VPN 或本机 relay。', failed: '失败：{message}',
+    wallTime: '总耗时', successful: '成功数', totalTokens: '总 Token 数', aggregateTokens: '总 Token／秒', overlapRatio: '重叠比例',
+    running: '测试中…', completed: '已完成 {done} / {total}', downloadJson: '下载 JSON', downloadCsv: '下载 CSV', copySummary: '复制摘要',
+    timeline: '时间轴', runningRange: '（0 秒 → 测试中）', started: '开始：{time}', startedFinished: '开始：{start} · 结束：{end}', perRequest: '单次请求明细',
+    tableStart: '开始', tableEnd: '结束', tableDuration: '耗时', tableTtft: 'TTFT', tableTokens: 'Token', tableTokSec: 'Token／秒', tableStatus: '状态', tableNote: '备注',
+    statusSuccess: '成功', statusTimeout: '超时', statusException: '异常', statusError: '错误', streamNote: '流式={status}', copied: '已复制', copyFailed: '复制失败',
+    verdictInconclusive: '无法判定，需要至少 2 次成功请求', verdictConcurrent: '并发，请求正在并行处理', verdictSequential: '串行，请求逐一排队处理', verdictPartial: '部分并发，并行处理能力受限',
+    corsLikely: '可能是 CORS，API 阻止了此浏览器来源'
+  }
+};
+let currentLanguage = 'en';
+
+function t(key, vars) {
+  const table = I18N[currentLanguage] || I18N.en;
+  let value = table[key] || I18N.en[key] || key;
+  Object.entries(vars || {}).forEach(([name, replacement]) => {
+    value = value.replaceAll('{' + name + '}', String(replacement));
+  });
+  return value;
+}
+
+function statusLabel(status) {
+  return ({ success: t('statusSuccess'), timeout: t('statusTimeout'), exception: t('statusException'), error: t('statusError') })[status] || status;
+}
+
+function applyThemeUi() {
+  const isDark = document.documentElement.classList.contains('dark');
+  const label = document.getElementById('themeLabel');
+  const toggle = document.getElementById('themeToggle');
+  if (label) label.textContent = isDark ? t('themeLight') : t('themeDark');
+  if (toggle) {
+    toggle.setAttribute('aria-pressed', String(isDark));
+    toggle.setAttribute('aria-label', isDark ? t('themeLight') : t('themeDark'));
+    toggle.title = isDark ? t('themeLight') : t('themeDark');
+  }
+  const metaTheme = document.querySelector('meta[name="theme-color"]' + (isDark ? '[media*="dark"]' : '[media*="light"]'));
+  if (metaTheme) document.querySelector('meta[name="theme-color"]' + (isDark ? '[media*="light"]' : '[media*="dark"]')).setAttribute('content', isDark ? '#121417' : '#fdfbf7');
+}
+
+function applyLanguage(language) {
+  currentLanguage = I18N[language] ? language : 'en';
+  document.documentElement.lang = currentLanguage;
+  try { localStorage.setItem('llmct_language', currentLanguage); } catch (e) {}
+  document.title = t('pageTitle');
+  const description = document.querySelector('meta[name="description"]');
+  if (description) description.setAttribute('content', t('metaDescription'));
+  document.querySelectorAll('[data-i18n]').forEach((element) => { element.textContent = t(element.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => { element.placeholder = t(element.dataset.i18nPlaceholder); });
+  const languagePicker = document.getElementById('languagePicker');
+  const languageLabel = document.getElementById('languagePickerLabel');
+  if (languageLabel) languageLabel.textContent = currentLanguage === 'zh-Hant' ? '繁體中文' : currentLanguage === 'zh-Hans' ? '简体中文' : 'English';
+  if (languagePicker) languagePicker.setAttribute('aria-label', t('language'));
+  document.querySelectorAll('.language-option').forEach((option) => option.setAttribute('aria-selected', String(option.dataset.language === currentLanguage)));
+  applyThemeUi();
+  if (typeof modelCatalog !== 'undefined' && modelCatalog.size) renderModelCatalog();
+  if (typeof latestRun !== 'undefined' && latestRun) finalizeRender(latestRun);
+}
+
 /* ---------- Theme ---------- */
 function toggleTheme() {
   const html = document.documentElement;
   const goingDark = !html.classList.contains('dark');
   html.classList.toggle('dark', goingDark);
-  document.getElementById('themeLabel').textContent = goingDark ? 'Light mode' : 'Dark mode';
+  applyThemeUi();
   document.getElementById('iconMoon').classList.toggle('hidden', goingDark);
   document.getElementById('iconSun').classList.toggle('hidden', !goingDark);
   try { localStorage.setItem('llmct_theme', goingDark ? 'dark' : 'light'); } catch (e) {}
@@ -466,27 +844,254 @@ async function llmctFetch(url, init) {
 /* ---------- Fetch models ---------- */
 // Calls the provider's /v1/models endpoint and populates the model dropdown.
 // Works with both the page-side fetch() and the extension relay (llmctFetch).
+let modelCatalog = new Map();
+
+function modelId(model) {
+  const value = model && (model.id || model.name || model.model || model.slug);
+  return typeof value === 'string' && value.startsWith('models/') ? value.slice(7) : value;
+}
+
+function escapeHtml(value) {
+  return String(value === undefined || value === null ? '' : value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function readModelField(model, paths) {
+  for (const path of paths) {
+    let value = model;
+    for (const part of path.split('.')) value = value && value[part];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return null;
+}
+
+function formatDetailValue(value) {
+  if (Array.isArray(value)) return value.join(', ');
+  if (value && typeof value === 'object') return Object.entries(value).map(([key, item]) => key + ': ' + item).join(' · ');
+  return String(value);
+}
+
+function formatTokenLimit(value) {
+  if (value === null || value === undefined || value === '') return t('providerNotProvided');
+  const number = Number(value);
+  return Number.isFinite(number) ? new Intl.NumberFormat().format(number) : formatDetailValue(value);
+}
+
+function formatPrice(value) {
+  if (value === null || value === undefined || value === '') return t('providerNotProvided');
+  const number = Number(value);
+  if (!Number.isFinite(number)) return formatDetailValue(value);
+  return '$' + (number * 1000000).toFixed(number < 0.0001 ? 3 : 2) + ' ' + t('perMillionTokens');
+}
+
+function formatCreated(value) {
+  if (value === null || value === undefined || value === '') return t('providerNotProvided');
+  const date = typeof value === 'number' || /^\d+$/.test(String(value))
+    ? new Date(Number(value) * 1000)
+    : new Date(String(value));
+  return Number.isNaN(date.getTime()) ? formatDetailValue(value) : date.toLocaleString();
+}
+
+function normalizeGeminiBase(raw) {
+  let url = (raw || '').trim().replace(/\/+$/, '');
+  if (!url) return url;
+  url = url.replace(/[?&]alt=sse$/i, '').replace(/[?&]key=[^&]+/i, '');
+  url = url.replace(/\/models\/[^/]+:(?:streamGenerateContent|generateContent)$/i, '');
+  url = url.replace(/\/models$/i, '');
+  if (!/\/v1(?:beta)?$/i.test(url)) url += '/v1beta';
+  return url;
+}
+
+function geminiRequestUrl(endpoint, model) {
+  return normalizeGeminiBase(endpoint) + '/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse';
+}
+
+function thinkingBudget(provider, strength, maxTokens) {
+  if (strength === 'off') return null;
+  const requested = { low: 1024, medium: 4096, high: 8192 }[strength] || 4096;
+  return provider === 'anthropic' ? Math.max(1, Math.min(requested, maxTokens - 1)) : requested;
+}
+
+function capabilityValue(model, paths, fallbackMatcher) {
+  const explicit = readModelField(model, paths);
+  if (explicit !== null) return explicit;
+  if (fallbackMatcher) {
+    const source = readModelField(model, ['supportedGenerationMethods', 'supported_generation_methods', 'supportedParameters', 'supported_parameters', 'architecture.input_modalities', 'input_modalities', 'modalities']);
+    const values = Array.isArray(source) ? source : [source];
+    if (values.some((value) => fallbackMatcher(String(value).toLowerCase()))) return true;
+  }
+  return null;
+}
+
+function modelRequestHeaders(provider, apiKey) {
+  if (provider === 'anthropic') {
+    return {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    };
+  }
+  if (provider === 'gemini') return { 'x-goog-api-key': apiKey };
+  return { 'Authorization': 'Bearer ' + apiKey };
+}
+
+function modelDetailEndpoint(provider, raw, id) {
+  if (provider === 'gemini') return normalizeGeminiBase(raw) + '/models/' + encodeURIComponent(id);
+  let base = endpointBase(raw);
+  if (!/\/v1$/i.test(base)) base = base.replace(/\/+$/, '') + '/v1';
+  return base.replace(/\/+$/, '') + '/models/' + encodeURIComponent(id);
+}
+
+function modelNeedsRemoteDetails(model) {
+  return readModelField(model, [
+    'context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit',
+    'outputTokenLimit', 'output_token_limit', 'max_output_tokens', 'max_completion_tokens',
+    'top_provider.context_length', 'top_provider.max_completion_tokens', 'pricing.prompt',
+    'description', 'architecture.input_modalities', 'supported_parameters', 'supportedGenerationMethods',
+  ]) === null;
+}
+
+function formatCapability(value) {
+  if (value === true) return t('supported');
+  if (value === false) return t('notSupported');
+  return value === null || value === undefined || value === '' ? t('providerNotProvided') : formatDetailValue(value);
+}
+
+function selectModel(value) {
+  if (!value) return;
+  const model = modelCatalog.get(value);
+  const input = document.getElementById('model');
+  if (input) input.value = value;
+  const picker = document.getElementById('modelPicker');
+  const pickerLabel = document.getElementById('modelPickerLabel');
+  if (pickerLabel) pickerLabel.textContent = model && (model.displayName || model.name) ? (model.displayName || model.name) : value;
+  if (picker) picker.open = false;
+  document.querySelectorAll('.model-option').forEach((option) => { option.setAttribute('aria-selected', String(option.dataset.modelId === value)); });
+  document.querySelectorAll('.model-card').forEach((card) => { card.classList.toggle('is-selected', card.dataset.modelId === value); });
+  saveField('model', value);
+  validateRunButton();
+}
+
+function modelDetailMarkup(model) {
+  const fields = [
+    [t('contextWindow'), formatTokenLimit(readModelField(model, ['context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit', 'top_provider.context_length']))],
+    [t('maxOutput'), formatTokenLimit(readModelField(model, ['max_output_tokens', 'max_completion_tokens', 'outputTokenLimit', 'output_token_limit', 'top_provider.max_completion_tokens', 'top_provider.max_output_tokens']))],
+    [t('inputPrice'), formatPrice(readModelField(model, ['pricing.prompt', 'pricing.input', 'input_price']))],
+    [t('outputPrice'), formatPrice(readModelField(model, ['pricing.completion', 'pricing.output', 'output_price']))],
+    [t('owner'), readModelField(model, ['owned_by', 'publisher', 'owner'])],
+    [t('created'), formatCreated(readModelField(model, ['created', 'created_at']))],
+    [t('baseModel'), readModelField(model, ['baseModelId', 'base_model_id', 'base_model', 'canonical_slug'])],
+    [t('version'), readModelField(model, ['version', 'model_version', 'modelVersion'])],
+    [t('modalities'), readModelField(model, ['architecture.input_modalities', 'input_modalities', 'modalities'])],
+    [t('modality'), readModelField(model, ['architecture.modality', 'modality'])],
+    [t('tokenizer'), readModelField(model, ['architecture.tokenizer', 'tokenizer'])],
+    [t('knowledgeCutoff'), readModelField(model, ['knowledge_cutoff', 'knowledgeCutoff'])],
+    [t('expirationDate'), readModelField(model, ['expiration_date', 'expirationDate'])],
+    [t('supportedParameters'), readModelField(model, ['supported_parameters', 'supportedParameters'])],
+  ];
+  const capabilities = [
+    [t('thinkingSupport'), capabilityValue(model, ['thinking', 'supports_thinking', 'supports_reasoning', 'reasoning', 'thinking_support'], (value) => value.includes('reason') || value.includes('thinking'))],
+    [t('imageInput'), capabilityValue(model, ['supports_image_input', 'image_input'], (value) => value.includes('image'))],
+    [t('audioInput'), capabilityValue(model, ['supports_audio_input', 'audio_input'], (value) => value.includes('audio'))],
+    [t('videoInput'), capabilityValue(model, ['supports_video_input', 'video_input'], (value) => value.includes('video'))],
+    [t('toolCalling'), capabilityValue(model, ['tool_calling', 'supports_tools', 'supports_function_calling', 'function_calling'], (value) => value.includes('tool') || value.includes('function'))],
+    [t('structuredOutput'), capabilityValue(model, ['structured_outputs', 'json_mode', 'supports_json_mode'], (value) => value.includes('json') || value.includes('response_format'))],
+    [t('streaming'), capabilityValue(model, ['streaming', 'supports_streaming'], (value) => value.includes('stream'))],
+  ].map(([label, value]) => [label, formatCapability(value)]);
+  const description = readModelField(model, ['description', 'model_description']);
+  const available = fields.filter(([, value]) => value !== null && value !== undefined && value !== '' && value !== t('providerNotProvided'));
+  const capabilityGrid = capabilities.map(([label, value]) => '<div class="model-detail-item"><div class="model-detail-label">' + escapeHtml(label) + '</div><div class="model-detail-value">' + escapeHtml(formatDetailValue(value)) + '</div></div>').join('');
+  return (description ? '<p class="model-description">' + escapeHtml(description) + '</p>' : '')
+    + '<div class="model-detail-section"><div class="model-detail-section-title">' + escapeHtml(t('modelBasics')) + '</div>'
+    + (available.length ? '<div class="model-details-grid">' + available.map(([label, value]) => '<div class="model-detail-item"><div class="model-detail-label">' + escapeHtml(label) + '</div><div class="model-detail-value">' + escapeHtml(formatDetailValue(value)) + '</div></div>').join('') + '</div>' : '<p class="model-details-empty">' + escapeHtml(t('modelDetailsEmpty')) + '</p>')
+    + '</div><div class="model-detail-section"><div class="model-detail-section-title">' + escapeHtml(t('capabilities')) + '</div><div class="model-details-grid">' + capabilityGrid + '</div></div>';
+}
+
+function renderModelCatalog() {
+  const view = document.getElementById('modelCatalogView');
+  const grid = document.getElementById('modelCatalogGrid');
+  const count = document.getElementById('modelCatalogCount');
+  if (!view || !grid || !count) return;
+  const ids = Array.from(modelCatalog.keys()).sort();
+  count.textContent = t('modelCount', { count: ids.length });
+  grid.innerHTML = ids.map((id) => {
+    const model = modelCatalog.get(id);
+    const displayName = model.displayName || model.name || id;
+    const context = formatTokenLimit(readModelField(model, ['context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit', 'top_provider.context_length']));
+    const maxOutput = formatTokenLimit(readModelField(model, ['max_output_tokens', 'max_completion_tokens', 'outputTokenLimit', 'output_token_limit', 'top_provider.max_completion_tokens', 'top_provider.max_output_tokens']));
+    const capabilities = [
+      [t('thinkingSupport'), capabilityValue(model, ['thinking', 'supports_thinking', 'supports_reasoning', 'reasoning', 'thinking_support'], (value) => value.includes('reason') || value.includes('thinking'))],
+      [t('imageInput'), capabilityValue(model, ['supports_image_input', 'image_input'], (value) => value.includes('image'))],
+      [t('toolCalling'), capabilityValue(model, ['tool_calling', 'supports_tools', 'supports_function_calling', 'function_calling'], (value) => value.includes('tool') || value.includes('function'))],
+      [t('streaming'), capabilityValue(model, ['streaming', 'supports_streaming'], (value) => value.includes('stream'))],
+    ].filter(([, value]) => value === true).map(([label]) => '<span class="model-capability-chip">' + escapeHtml(label) + '</span>').join('');
+    return '<article class="model-card' + (document.getElementById('model').value.trim() === id ? ' is-selected' : '') + '" data-model-id="' + escapeHtml(id) + '">'
+      + '<div class="model-card-header"><div><h5 class="model-card-name">' + escapeHtml(displayName) + '</h5><p class="model-card-id">' + escapeHtml(id) + '</p></div></div>'
+      + '<div class="model-card-metrics"><div class="model-card-metric"><div class="model-card-metric-label">' + escapeHtml(t('contextWindow')) + '</div><div class="model-card-metric-value">' + escapeHtml(context) + '</div></div><div class="model-card-metric"><div class="model-card-metric-label">' + escapeHtml(t('maxOutput')) + '</div><div class="model-card-metric-value">' + escapeHtml(maxOutput) + '</div></div></div>'
+      + '<div class="model-capability-list">' + (capabilities || '<span class="model-capability-chip">' + escapeHtml(t('capabilitiesNotProvided')) + '</span>') + '</div>'
+      + '<details class="model-card-details" data-model-detail-id="' + escapeHtml(id) + '"><summary>' + escapeHtml(t('viewDetails')) + '</summary><div data-model-detail-body>' + modelDetailMarkup(model) + '</div></details>'
+      + '<button type="button" class="model-card-action" data-use-model="' + escapeHtml(id) + '">' + escapeHtml(t('useModel')) + '</button></article>';
+  }).join('');
+  grid.querySelectorAll('[data-use-model]').forEach((button) => button.addEventListener('click', () => selectModel(button.dataset.useModel)));
+  grid.querySelectorAll('[data-model-detail-id]').forEach((details) => details.addEventListener('toggle', () => {
+    if (details.open && !details.dataset.loaded && modelNeedsRemoteDetails(modelCatalog.get(details.dataset.modelDetailId))) loadModelDetails(details.dataset.modelDetailId, details);
+  }));
+  view.classList.remove('hidden');
+}
+
+async function loadModelDetails(id, details) {
+  const model = modelCatalog.get(id);
+  const body = details.querySelector('[data-model-detail-body]');
+  if (!model || !body || details.dataset.loading) return;
+  details.dataset.loading = 'true';
+  body.insertAdjacentHTML('afterbegin', '<p class="model-detail-loading">' + escapeHtml(t('loadingDetails')) + '</p>');
+  try {
+    const endpoint = modelDetailEndpoint(currentProvider, document.getElementById('endpoint').value.trim(), id);
+    const res = await llmctFetch(endpoint, { method: 'GET', headers: modelRequestHeaders(currentProvider, document.getElementById('apiKey').value.trim()) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const detail = data && (data.data || data.model || data);
+    if (!detail || typeof detail !== 'object' || Array.isArray(detail)) throw new Error('Unexpected model detail response');
+    const merged = Object.assign({}, model, detail);
+    modelCatalog.set(id, merged);
+    body.innerHTML = modelDetailMarkup(merged);
+  } catch (error) {
+    body.innerHTML = modelDetailMarkup(model) + '<p class="model-detail-error">' + escapeHtml(t('detailsUnavailable')) + '</p>';
+  } finally {
+    details.dataset.loading = '';
+    details.dataset.loaded = 'true';
+  }
+}
+
 async function fetchModels() {
   const apiKey = document.getElementById('apiKey').value.trim();
   const endpoint = document.getElementById('endpoint').value.trim();
   const status = document.getElementById('modelsStatus');
-  const select = document.getElementById('modelSelect');
+  const picker = document.getElementById('modelPicker');
+  const pickerOptions = document.getElementById('modelPickerOptions');
+  const pickerCount = document.getElementById('modelPickerCount');
   const btn = document.getElementById('fetchModelsBtn');
   if (!apiKey || !endpoint) {
     status.style.color = 'var(--text-danger)';
-    status.textContent = 'Set API key and endpoint first.';
+    status.textContent = t('setCredentials');
     return;
   }
-  // Strip the trailing path to derive the base URL.
-  let base = endpoint.replace(/\/(chat\/completions|messages)(\/.*)?$/i, '');
-  if (!/\/v1$/i.test(base)) base = base.replace(/\/+$/, '') + '/v1';
-  const url = base + '/models';
+  // Strip the trailing path to derive the provider model-list URL.
+  let base;
+  if (currentProvider === 'gemini') {
+    base = normalizeGeminiBase(endpoint);
+  } else {
+    base = endpointBase(endpoint);
+    if (!/\/v1$/i.test(base)) base = base.replace(/\/+$/, '') + '/v1';
+  }
+  const url = base.replace(/\/+$/, '') + '/models';
 
   btn.disabled = true;
   const originalLabel = btn.textContent;
-  btn.textContent = 'Fetching…';
+  btn.textContent = t('fetching');
   status.style.color = 'var(--text-dim)';
-  status.textContent = 'GET ' + url;
+  status.textContent = t('modelsRequest', { url: url });
 
   let headers;
   if (currentProvider === 'anthropic') {
@@ -495,6 +1100,8 @@ async function fetchModels() {
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true',
     };
+  } else if (currentProvider === 'gemini') {
+    headers = { 'x-goog-api-key': apiKey };
   } else {
     headers = { 'Authorization': 'Bearer ' + apiKey };
   }
@@ -508,32 +1115,43 @@ async function fetchModels() {
     const data = await res.json();
     const list = Array.isArray(data.data) ? data.data : (Array.isArray(data.models) ? data.models : []);
     if (list.length === 0) throw new Error('Empty model list — unexpected response shape.');
-    // Sort alphabetically and dedupe ids.
-    const ids = Array.from(new Set(list.map(m => m && (m.id || m.name)).filter(Boolean))).sort();
-    // Reset select.
-    select.innerHTML = '<option value="">Pick a model… (' + ids.length + ')</option>';
+    // Keep the full provider objects so rich model catalogs can be inspected.
+    modelCatalog = new Map(list.map(model => [modelId(model), model]).filter(([id]) => id));
+    const ids = Array.from(modelCatalog.keys()).sort();
+    // Build the picker with native buttons so its open menu follows the app theme.
+    pickerOptions.replaceChildren();
     ids.forEach(id => {
-      const opt = document.createElement('option');
-      opt.value = id;
-      opt.textContent = id;
-      select.appendChild(opt);
+      const opt = document.createElement('button');
+      const model = modelCatalog.get(id);
+      opt.type = 'button';
+      opt.className = 'model-option';
+      opt.dataset.modelId = id;
+      opt.setAttribute('role', 'option');
+      opt.setAttribute('aria-selected', 'false');
+      opt.textContent = model.displayName || model.name ? (model.displayName || model.name) + ' · ' + id : id;
+      opt.addEventListener('click', () => selectModel(id));
+      pickerOptions.appendChild(opt);
     });
-    select.style.display = '';
+    pickerCount.textContent = '(' + ids.length + ')';
+    picker.classList.remove('hidden');
+    renderModelCatalog();
+    const currentModel = document.getElementById('model').value.trim();
+    if (currentModel && modelCatalog.has(currentModel)) selectModel(currentModel);
     status.style.color = 'var(--text-success, #14532d)';
-    status.textContent = ids.length + ' model' + (ids.length === 1 ? '' : 's') + ' loaded.';
+    status.textContent = t(ids.length === 1 ? 'modelsLoadedOne' : 'modelsLoadedMany', { count: ids.length });
   } catch (e) {
     status.style.color = 'var(--text-danger)';
     const message = e && e.message ? e.message : String(e);
     if (message.includes('401') || message.includes('403')) {
-      status.textContent = 'API Key 無效或沒有模型列表權限。';
+      status.textContent = t('invalidCredentials');
     } else if (message.includes('404')) {
-      status.textContent = '找不到 /v1/models，請確認這是 OpenAI-compatible Base URL。';
+      status.textContent = t('modelsNotFound');
     } else if (message.toLowerCase().includes('failed to fetch')) {
-      status.textContent = '無法連線到 API。請確認 URL、VPN 或本機 relay。';
+      status.textContent = t('apiUnavailable');
     } else {
-      status.textContent = 'Failed: ' + message;
+      status.textContent = t('failed', { message: message });
     }
-    select.style.display = 'none';
+    picker.classList.add('hidden');
   } finally {
     btn.disabled = false;
     btn.textContent = originalLabel;
@@ -546,33 +1164,44 @@ let currentProvider = 'openai';
 function normalizeEndpoint(provider, raw) {
   let url = (raw || '').trim();
   if (!url) return url;
-  url = url.replace(/\/+$/, '');
-  if (provider === 'anthropic') {
-    if (/\/messages$/i.test(url)) return url;
-    if (/\/v1$/i.test(url)) return url + '/messages';
-    return url + '/v1/messages';
-  }
-  if (/\/chat\/completions$/i.test(url)) return url;
-  return url + '/chat/completions';
+  url = url.replace(/[\s]+$/, '').replace(/\/+$/, '');
+  if (provider === 'gemini') return normalizeGeminiBase(url);
+  return url;
+}
+
+function endpointBase(raw) {
+  let base = normalizeEndpoint('openai', raw);
+  let previous;
+  do {
+    previous = base;
+    base = base
+      .replace(/\/models\/[^/]+:(?:streamGenerateContent|generateContent)(?:\?alt=sse)?$/i, '')
+      .replace(/\/chat\/completions(?:\/v1\/messages)?$/i, '')
+      .replace(/\/v1\/messages$/i, '')
+      .replace(/\/messages$/i, '');
+  } while (base !== previous);
+  return base;
+}
+
+function endpointHasRequestPath(raw) {
+  return /\/(?:chat\/completions|v1\/messages|messages|models\/[^/]+:(?:streamGenerateContent|generateContent))(?:\/|$|\?)/i.test(raw || '');
+}
+
+function requestEndpoint(provider, raw) {
+  const endpoint = normalizeEndpoint(provider, raw);
+  if (provider === 'gemini') return endpoint;
+  if (endpointHasRequestPath(endpoint)) return endpoint;
+  if (provider === 'anthropic') return /\/v1$/i.test(endpoint) ? endpoint + '/messages' : endpoint + '/v1/messages';
+  return endpoint + '/chat/completions';
 }
 
 function setProvider(provider) {
-  currentProvider = provider;
+  currentProvider = ['openai', 'anthropic', 'gemini'].includes(provider) ? provider : 'openai';
+  provider = currentProvider;
   document.getElementById('providerBtnOpenai').classList.toggle('active', provider === 'openai');
   document.getElementById('providerBtnAnthropic').classList.toggle('active', provider === 'anthropic');
+  document.getElementById('providerBtnGemini').classList.toggle('active', provider === 'gemini');
   saveField('provider', provider);
-  const endpointEl = document.getElementById('endpoint');
-  if (endpointEl.value.trim()) {
-    // If the user already has a full endpoint (matches either provider's path),
-    // do NOT rewrite it on provider switch — that caused the "appends a path"
-    // behavior. Only rewrite bare base URLs.
-    const v = endpointEl.value.trim();
-    const isFullEndpoint = /\/(chat\/completions|messages)(\/|$|\?)/i.test(v);
-    if (!isFullEndpoint) {
-      endpointEl.value = normalizeEndpoint(provider, v);
-      saveField('endpoint', endpointEl.value);
-    }
-  }
 }
 
 /* ---------- Run-button validation ---------- */
@@ -594,13 +1223,15 @@ function validateRunButton() {
 (function init() {
   let savedTheme = null;
   try { savedTheme = localStorage.getItem('llmct_theme'); } catch (e) {}
-  if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) document.documentElement.classList.add('dark');
 
   window.addEventListener('DOMContentLoaded', () => {
-    const isDark = document.documentElement.classList.contains('dark');
-    document.getElementById('themeLabel').textContent = isDark ? 'Light mode' : 'Dark mode';
-    document.getElementById('iconMoon').classList.toggle('hidden', isDark);
-    document.getElementById('iconSun').classList.toggle('hidden', !isDark);
+    let savedLanguage = null;
+    try { savedLanguage = localStorage.getItem('llmct_language'); } catch (e) {}
+    const browserLanguage = (navigator.language || '').toLowerCase();
+    const defaultLanguage = browserLanguage.startsWith('zh-cn') || browserLanguage.startsWith('zh-sg') ? 'zh-Hans' : (browserLanguage.startsWith('zh') ? 'zh-Hant' : 'en');
+    applyLanguage(savedLanguage || defaultLanguage);
 
     const savedApiKey = loadField('apiKey');
     const savedEndpoint = loadField('endpoint');
@@ -609,8 +1240,13 @@ function validateRunButton() {
 
     if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
     if (savedModel) document.getElementById('model').value = savedModel;
-    setProvider(savedProvider === 'anthropic' ? 'anthropic' : 'openai');
+    setProvider(['openai', 'anthropic', 'gemini'].includes(savedProvider) ? savedProvider : 'openai');
     if (savedEndpoint) document.getElementById('endpoint').value = normalizeEndpoint(currentProvider, savedEndpoint);
+
+    document.querySelectorAll('.language-option').forEach((option) => option.addEventListener('click', () => {
+      applyLanguage(option.dataset.language);
+      document.getElementById('languagePicker').open = false;
+    }));
 
     ['apiKey', 'model'].forEach(id => {
       document.getElementById(id).addEventListener('input', (e) => {
@@ -690,6 +1326,7 @@ async function callOnce(idx, cfg, testStart, onEvent) {
   };
   onEvent({ type: 'start', result });
 
+  let requestUrl = cfg.endpoint;
   let headers, bodyObj;
   if (cfg.provider === 'anthropic') {
     headers = {
@@ -702,13 +1339,36 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       model: cfg.model,
       messages: [{ role: 'user', content: cfg.prompt }],
       max_tokens: cfg.maxTokens,
-      temperature: cfg.temperature,
-      top_p: cfg.topP,
       stream: true,
     };
+    if (cfg.thinkingStrength === 'off') {
+      bodyObj.temperature = cfg.temperature;
+      bodyObj.top_p = cfg.topP;
+    } else {
+      bodyObj.thinking = { type: 'enabled', budget_tokens: thinkingBudget('anthropic', cfg.thinkingStrength, cfg.maxTokens) };
+    }
     if (cfg.systemPrompt && cfg.systemPrompt.trim() !== '') {
       bodyObj.system = cfg.systemPrompt;
     }
+  } else if (cfg.provider === 'gemini') {
+    requestUrl = geminiRequestUrl(cfg.endpoint, cfg.model);
+    headers = {
+      'x-goog-api-key': cfg.apiKey,
+      'Content-Type': 'application/json',
+    };
+    bodyObj = {
+      contents: [{ role: 'user', parts: [{ text: cfg.prompt }] }],
+      generationConfig: {
+        maxOutputTokens: cfg.maxTokens,
+        temperature: cfg.temperature,
+        topP: cfg.topP,
+      },
+    };
+    if (cfg.systemPrompt && cfg.systemPrompt.trim() !== '') {
+      bodyObj.systemInstruction = { parts: [{ text: cfg.systemPrompt }] };
+    }
+    const budget = thinkingBudget('gemini', cfg.thinkingStrength, cfg.maxTokens);
+    if (budget !== null) bodyObj.generationConfig.thinkingConfig = { thinkingBudget: budget };
   } else {
     headers = {
       'Authorization': 'Bearer ' + cfg.apiKey,
@@ -728,6 +1388,7 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       top_p: cfg.topP,
       max_tokens: cfg.maxTokens,
     };
+    if (cfg.thinkingStrength !== 'off') bodyObj.reasoning_effort = cfg.thinkingStrength;
   }
 
   const controller = new AbortController();
@@ -742,13 +1403,12 @@ async function callOnce(idx, cfg, testStart, onEvent) {
   };
 
   try {
-    const res = await llmctFetch(cfg.endpoint, {
+    const res = await llmctFetch(requestUrl, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(bodyObj),
       signal: controller.signal,
     });
-    clearTimeout(timer);
     const endPerf = performance.now();
     const duration = (endPerf - startPerf) / 1000;
     result.http_status = res.status;
@@ -757,6 +1417,7 @@ async function callOnce(idx, cfg, testStart, onEvent) {
     result.duration_s = +duration.toFixed(3);
 
     if (!res.ok) {
+      clearTimeout(timer);
       result.status = 'http_error';
       result.error = (await res.text()).slice(0, 300);
       onEvent({ type: 'end', result });
@@ -797,6 +1458,16 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       onEvent({ type: 'chunk', result });
     };
 
+    const handleGeminiChunk = (obj) => {
+      if (!obj || (!obj.candidates && !obj.usageMetadata)) return;
+      chunkCount++;
+      stampFirstChunk();
+      const usage = obj.usageMetadata || {};
+      if (typeof usage.candidatesTokenCount === 'number') completionTokens = usage.candidatesTokenCount;
+      else if (typeof usage.totalTokenCount === 'number') completionTokens = usage.totalTokenCount;
+      onEvent({ type: 'chunk', result });
+    };
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -825,19 +1496,21 @@ async function callOnce(idx, cfg, testStart, onEvent) {
           handleAnthropicChunk(anthropicEvent, parsed);
           if (anthropicEvent === 'message_stop') { /* let the loop end naturally */ }
         } else {
-          // OpenAI-compatible: every line is `data: <payload>` or `data:[DONE]`.
+          // OpenAI-compatible and Gemini SSE both send JSON in `data:` lines.
           for (const line of lines) {
             if (!line.startsWith('data:')) continue;
             const payload = line.slice(5).trim();
             if (payload === '[DONE]') continue;
             let parsed;
             try { parsed = JSON.parse(payload); } catch (e) { continue; }
-            handleOpenAIChunk(parsed);
+            if (cfg.provider === 'gemini') handleGeminiChunk(parsed);
+            else handleOpenAIChunk(parsed);
           }
         }
       }
     }
 
+    clearTimeout(timer);
     result.completion_tokens = completionTokens;
     // If we never saw a usage chunk, fall back to nothing — tokens_per_sec stays 0
     // and the duration is reported via the timeline. Don't fabricate.
@@ -857,7 +1530,7 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       result.error = 'No response within ' + cfg.timeout + 's';
     } else {
       result.status = 'exception';
-      result.error = (e.message || 'Network error') + ' (likely CORS — the API blocked this browser origin)';
+      result.error = (e.message || 'Network error') + ' (' + t('corsLikely') + ')';
     }
     onEvent({ type: 'end', result });
     return result;
@@ -868,19 +1541,18 @@ async function runTest() {
   if (!validateRunButton()) return;
 
   const endpointEl = document.getElementById('endpoint');
-  endpointEl.value = normalizeEndpoint(currentProvider, endpointEl.value);
-  saveField('endpoint', endpointEl.value);
+  const rawEndpoint = endpointEl.value.trim();
 
   const btn = document.getElementById('runBtn');
   const runLabel = document.getElementById('runLabel');
   btn.dataset.running = '1';
   btn.disabled = true;
-  runLabel.textContent = 'RUNNING…';
+  runLabel.textContent = t('runRunning');
 
   const cfg = {
     provider: currentProvider,
     apiKey: document.getElementById('apiKey').value,
-    endpoint: endpointEl.value,
+    endpoint: requestEndpoint(currentProvider, rawEndpoint),
     model: document.getElementById('model').value,
     systemPrompt: document.getElementById('systemPrompt').value,
     prompt: document.getElementById('prompt').value,
@@ -889,6 +1561,7 @@ async function runTest() {
     timeout: parseFloat(document.getElementById('timeout').value),
     temperature: parseFloat(document.getElementById('temperature').value),
     topP: parseFloat(document.getElementById('topP').value),
+    thinkingStrength: document.getElementById('thinkingStrength').value,
   };
 
   // Eagerly render the skeleton BEFORE any request fires, so per-request
@@ -924,16 +1597,16 @@ async function runTest() {
 
   let verdict, verdictKind;
   if (successResults.length <= 1) {
-    verdict = 'Inconclusive — need 2+ successful requests';
+    verdict = t('verdictInconclusive');
     verdictKind = 'warn';
   } else if (overlapRatio >= cfg.concurrency * 0.7) {
-    verdict = 'Concurrent — requests processed in parallel';
+    verdict = t('verdictConcurrent');
     verdictKind = 'success';
   } else if (overlapRatio <= 1.3) {
-    verdict = 'Sequential — requests queued one at a time';
+    verdict = t('verdictSequential');
     verdictKind = 'danger';
   } else {
-    verdict = 'Partial concurrency — limited parallelism';
+    verdict = t('verdictPartial');
     verdictKind = 'warn';
   }
 
@@ -952,7 +1625,7 @@ async function runTest() {
   });
 
   btn.dataset.running = '';
-  runLabel.textContent = 'RUN TEST';
+  runLabel.textContent = t('runTest');
   validateRunButton();
 }
 
@@ -997,23 +1670,23 @@ function renderSkeleton(N, cfg) {
 
   const html = [];
   html.push('<div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="statRow">');
-  for (let i = 0; i < 5; i++) html.push(statBlock('—', ['Wall Time','Successful','Total Tokens','Agg. Tokens/sec','Overlap Ratio'][i]));
+  for (let i = 0; i < 5; i++) html.push(statBlock('—', [t('wallTime'), t('successful'), t('totalTokens'), t('aggregateTokens'), t('overlapRatio')][i]));
   html.push('</div>');
 
   html.push('<div id="verdictBox" class="verdict-box" style="background-color: var(--fill-warn); color: var(--text-warn);">');
   html.push('<span class="dot" style="background-color: var(--text-warn);"></span>');
-  html.push('<span id="verdictText">Running…</span>');
-  html.push('<span id="verdictProgress" style="margin-left: auto; font-weight: 600; font-size: 0.85rem; opacity: 0.85;">0 / ' + N + ' completed</span>');
+  html.push('<span id="verdictText">' + t('running') + '</span>');
+  html.push('<span id="verdictProgress" style="margin-left: auto; font-weight: 600; font-size: 0.85rem; opacity: 0.85;">' + t('completed', { done: 0, total: N }) + '</span>');
   html.push('</div>');
 
   html.push('<div id="exportBar" class="flex flex-wrap gap-2">');
-  html.push('<button id="downloadJsonBtn" type="button" class="neo-border px-3 py-2 text-xs font-bold" style="background-color: var(--bg-header);" disabled>Download JSON</button>');
-  html.push('<button id="downloadCsvBtn" type="button" class="neo-border px-3 py-2 text-xs font-bold" style="background-color: var(--bg-header);" disabled>Download CSV</button>');
-  html.push('<button id="copySummaryBtn" type="button" class="neo-border px-3 py-2 text-xs font-bold" style="background-color: var(--bg-header);" disabled>Copy summary</button>');
+  html.push('<button id="downloadJsonBtn" type="button" class="neo-border px-3 py-2 text-xs font-bold" style="background-color: var(--bg-header);" disabled>' + t('downloadJson') + '</button>');
+  html.push('<button id="downloadCsvBtn" type="button" class="neo-border px-3 py-2 text-xs font-bold" style="background-color: var(--bg-header);" disabled>' + t('downloadCsv') + '</button>');
+  html.push('<button id="copySummaryBtn" type="button" class="neo-border px-3 py-2 text-xs font-bold" style="background-color: var(--bg-header);" disabled>' + t('copySummary') + '</button>');
   html.push('</div>');
 
   html.push('<div class="neo-panel p-6">');
-  html.push('<h3 class="text-sm font-bold uppercase tracking-wider mb-4" style="color: var(--text-dim);">Timeline <span id="timelineRange">(0s → running)</span></h3>');
+  html.push('<h3 class="text-sm font-bold uppercase tracking-wider mb-4" style="color: var(--text-dim);">' + t('timeline') + ' <span id="timelineRange">' + t('runningRange') + '</span></h3>');
   html.push('<div id="timelineRows">');
   for (let i = 1; i <= N; i++) {
     html.push('<div class="grid items-center gap-3 mb-2" data-row="' + i + '" style="grid-template-columns: 36px 1fr 64px;">');
@@ -1027,14 +1700,14 @@ function renderSkeleton(N, cfg) {
     html.push('</div>');
   }
   html.push('</div>');
-  html.push('<div class="text-xs font-medium mt-3" style="color: var(--text-dim);" id="timelineFooter">Started: —</div>');
+  html.push('<div class="text-xs font-medium mt-3" style="color: var(--text-dim);" id="timelineFooter">' + t('started', { time: '—' }) + '</div>');
   html.push('</div>');
 
   // Per-request table — populated by finalizeRender
   html.push('<div class="neo-panel p-6 overflow-x-auto">');
-  html.push('<h3 class="text-sm font-bold uppercase tracking-wider mb-4" style="color: var(--text-dim);">Per-Request Detail</h3>');
+  html.push('<h3 class="text-sm font-bold uppercase tracking-wider mb-4" style="color: var(--text-dim);">' + t('perRequest') + '</h3>');
   html.push('<table class="data-table"><thead><tr>');
-  html.push('<th>#</th><th>Start</th><th>End</th><th>Duration</th><th>TTFT</th><th>Tokens</th><th>Tok/sec</th><th>Status</th><th>Note</th>');
+  html.push('<th>#</th><th>' + t('tableStart') + '</th><th>' + t('tableEnd') + '</th><th>' + t('tableDuration') + '</th><th>' + t('tableTtft') + '</th><th>' + t('tableTokens') + '</th><th>' + t('tableTokSec') + '</th><th>' + t('tableStatus') + '</th><th>' + t('tableNote') + '</th>');
   html.push('</tr></thead><tbody id="perReqTbody"></tbody></table>');
   html.push('</div>');
 
@@ -1055,7 +1728,7 @@ function renderSkeleton(N, cfg) {
   // Footer: started time
   const startIso = new Date().toISOString();
   const f = document.getElementById('timelineFooter');
-  if (f) f.textContent = 'Started: ' + startIso;
+  if (f) f.textContent = t('started', { time: startIso });
 }
 
 function axisNow() {
@@ -1066,7 +1739,7 @@ function repaintAxis(maxSoFar) {
   // We rescale as wall time grows. After finalize, maxSoFar = data.wall_time_s.
   // When running, maxSoFar is updated by passing the running max from the painter.
   const el = document.getElementById('timelineRange');
-  if (el) el.textContent = '(0s → ' + (maxSoFar > 0 ? maxSoFar + 's' : 'running') + ')';
+  if (el) el.textContent = maxSoFar > 0 ? '(0s → ' + maxSoFar + 's)' : t('runningRange');
 }
 
 function paintStart(i, result) {
@@ -1111,7 +1784,7 @@ function paintEnd(i, result) {
   repaintAxis(wall);
   pendingCount--;
   const p = document.getElementById('verdictProgress');
-  if (p) p.textContent = (rowEls.length - pendingCount) + ' / ' + rowEls.length + ' completed';
+  if (p) p.textContent = t('completed', { done: rowEls.length - pendingCount, total: rowEls.length });
 
   // Append the table row immediately so it's visible as soon as the request ends.
   appendTableRow(result);
@@ -1128,7 +1801,7 @@ function appendTableRow(r) {
     tbody.appendChild(tr);
   }
   const statusColor = r.status === 'success' ? 'var(--text-success)' : 'var(--text-danger)';
-  const note = r.error ? String(r.error).slice(0, 70) : (r.stream_status && r.stream_status !== 'ok' ? 'stream=' + r.stream_status : '');
+  const note = r.error ? String(r.error).slice(0, 70) : (r.stream_status && r.stream_status !== 'ok' ? t('streamNote', { status: r.stream_status }) : '');
   tr.innerHTML =
     '<td>' + r.index + '</td>' +
     '<td>' + (r.start_iso ? r.start_iso.split('T')[1].replace('Z','') : '-') + '</td>' +
@@ -1137,13 +1810,13 @@ function appendTableRow(r) {
     '<td>' + (r.ttft_s !== null && r.ttft_s !== undefined ? r.ttft_s + 's' : '-') + '</td>' +
     '<td>' + r.completion_tokens + '</td>' +
     '<td>' + r.tokens_per_sec + '</td>' +
-    '<td style="color:' + statusColor + '; font-weight:700;">' + r.status + '</td>' +
+    '<td style="color:' + statusColor + '; font-weight:700;">' + statusLabel(r.status) + '</td>' +
     '<td style="color: var(--text-dim);">' + note + '</td>';
 }
 
 function bumpProgress() {
   const p = document.getElementById('verdictProgress');
-  if (p) p.textContent = (rowEls.length - pendingCount) + ' / ' + rowEls.length + ' completed';
+  if (p) p.textContent = t('completed', { done: rowEls.length - pendingCount, total: rowEls.length });
 }
 
 // ---- finalize ----
@@ -1154,11 +1827,11 @@ function finalizeRender(data) {
   const statRow = document.getElementById('statRow');
   if (statRow) {
     statRow.innerHTML =
-      statBlock(data.wall_time_s + 's', 'Wall Time') +
-      statBlock(data.success_count + ' / ' + data.concurrency_requested, 'Successful') +
-      statBlock(data.total_tokens, 'Total Tokens') +
-      statBlock(data.aggregate_tokens_per_sec, 'Agg. Tokens/sec') +
-      statBlock(data.overlap_ratio + '×', 'Overlap Ratio');
+      statBlock(data.wall_time_s + 's', t('wallTime')) +
+      statBlock(data.success_count + ' / ' + data.concurrency_requested, t('successful')) +
+      statBlock(data.total_tokens, t('totalTokens')) +
+      statBlock(data.aggregate_tokens_per_sec, t('aggregateTokens')) +
+      statBlock(data.overlap_ratio + '×', t('overlapRatio'));
   }
 
   // Verdict pill.
@@ -1177,14 +1850,14 @@ function finalizeRender(data) {
     const v = document.getElementById('verdictText');
     if (v) v.textContent = data.verdict;
     const p = document.getElementById('verdictProgress');
-    if (p) p.textContent = data.success_count + ' / ' + data.concurrency_requested + ' completed';
+    if (p) p.textContent = t('completed', { done: data.success_count, total: data.concurrency_requested });
   }
 
   // Timeline range and footer.
   const tr = document.getElementById('timelineRange');
   if (tr) tr.textContent = '(0s → ' + data.wall_time_s + 's)';
   const tf = document.getElementById('timelineFooter');
-  if (tf) tf.textContent = 'Started: ' + data.test_start_iso + ' · Finished: ' + data.test_end_iso;
+  if (tf) tf.textContent = t('startedFinished', { start: data.test_start_iso, end: data.test_end_iso });
 
   // Re-apply final results to each row's bars (the X-axis is now stable).
   const wall = Math.max(data.wall_time_s, 0.001);
@@ -1261,9 +1934,9 @@ function wireExportButtons(data) {
           document.execCommand('copy');
           ta.remove();
         }
-        copyBtn.textContent = 'Copied!';
+        copyBtn.textContent = t('copied');
       } catch (e) {
-        copyBtn.textContent = 'Copy failed';
+        copyBtn.textContent = t('copyFailed');
       }
       setTimeout(function () { copyBtn.textContent = original; }, 1500);
     };
