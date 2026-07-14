@@ -1468,47 +1468,56 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       onEvent({ type: 'chunk', result });
     };
 
+    const processSseEvent = (rawEvent) => {
+      if (!rawEvent.trim()) return;
+      const lines = rawEvent.split('\n');
+      if (cfg.provider === 'anthropic') {
+        let dataPayload = null;
+        for (const line of lines) {
+          if (line.startsWith('event:')) {
+            anthropicEvent = line.slice(6).trim();
+          } else if (line.startsWith('data:')) {
+            dataPayload = line.slice(5).trim();
+          }
+        }
+        if (!dataPayload) return;
+        let parsed;
+        try { parsed = JSON.parse(dataPayload); } catch (e) { return; }
+        handleAnthropicChunk(anthropicEvent, parsed);
+        return;
+      }
+      // OpenAI-compatible and Gemini SSE both send JSON in `data:` lines.
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (payload === '[DONE]') continue;
+        let parsed;
+        try { parsed = JSON.parse(payload); } catch (e) { continue; }
+        if (cfg.provider === 'gemini') handleGeminiChunk(parsed);
+        else handleOpenAIChunk(parsed);
+      }
+    };
+
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
+      if (done) {
+        buffer += decoder.decode().replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        break;
+      }
+      // SSE permits CRLF line endings; normalize them before finding event boundaries.
+      buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
       // SSE events are separated by a blank line (`\n\n`).
       let sep;
       while ((sep = buffer.indexOf('\n\n')) !== -1) {
         const rawEvent = buffer.slice(0, sep);
         buffer = buffer.slice(sep + 2);
-        if (!rawEvent) continue;
-
-        const lines = rawEvent.split('\n');
-        if (cfg.provider === 'anthropic') {
-          let dataPayload = null;
-          for (const line of lines) {
-            if (line.startsWith('event:')) {
-              anthropicEvent = line.slice(6).trim();
-            } else if (line.startsWith('data:')) {
-              dataPayload = line.slice(5).trim();
-            }
-          }
-          if (!dataPayload) continue;
-          let parsed;
-          try { parsed = JSON.parse(dataPayload); } catch (e) { continue; }
-          handleAnthropicChunk(anthropicEvent, parsed);
-          if (anthropicEvent === 'message_stop') { /* let the loop end naturally */ }
-        } else {
-          // OpenAI-compatible and Gemini SSE both send JSON in `data:` lines.
-          for (const line of lines) {
-            if (!line.startsWith('data:')) continue;
-            const payload = line.slice(5).trim();
-            if (payload === '[DONE]') continue;
-            let parsed;
-            try { parsed = JSON.parse(payload); } catch (e) { continue; }
-            if (cfg.provider === 'gemini') handleGeminiChunk(parsed);
-            else handleOpenAIChunk(parsed);
-          }
-        }
+        processSseEvent(rawEvent);
       }
     }
+
+    // Some providers close immediately after the final data line without `\n\n`.
+    processSseEvent(buffer);
 
     clearTimeout(timer);
     result.completion_tokens = completionTokens;
