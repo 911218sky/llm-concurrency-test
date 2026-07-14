@@ -1,0 +1,6 @@
+services:
+  llm-concurrency-test:
+    image: ghcr.io/911218sky/llm-concurrency-test:latest
+    pull_policy: always
+    ports:
+      - "127.0.0.1:8777:8777"

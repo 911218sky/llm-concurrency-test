@@ -1,149 +1,142 @@
 # LLM Concurrency Test
 
-The fastest load and concurrency tester for LLM chat-completion APIs
-(inference) that lives in your browser. Fires N parallel requests from
-your browser at an OpenAI-compatible or Anthropic endpoint and measures
-whether the API actually processes them concurrently. Includes streaming
-TTFT, live timeline, JSON/CSV export.
+Measure whether an OpenAI-compatible or Anthropic-compatible chat API really
+processes concurrent requests. The browser sends N parallel requests and
+shows streaming time to first token (TTFT), a live request timeline, an
+overlap-ratio verdict, and JSON/CSV exports.
 
-If the API blocks browser-origin (CORS) requests, a small companion
-Chrome extension relays the requests through a background service worker
-so the same-origin policy no longer applies.
+**Hosted app:** <https://0xaungkon.github.io/llm-concurrency-test/>
 
-- **Extension:** under `extension/` — a 4-file MV3 add-on that adds a CORS
-  bypass.
-- **No backend.** Your API key never leaves your browser.
+There is no application backend. Your API key stays in the browser unless you
+choose the local Docker relay for an endpoint that blocks browser CORS.
 
-## Quick start
+## Choose a way to run it
 
-👉 **https://0xaungkon.github.io/llm-concurrency-test/**
+### Hosted app
 
-That's it — open the URL, paste your API key + endpoint + model, hit
-**RUN TEST**.
+Open the hosted app, enter the API key, endpoint, model, and concurrency, then
+select **RUN TEST**. No installation is required.
 
-## Local Docker relay
+### Docker Compose: pull the published image
 
-For APIs that block browser CORS, run the local relay in Docker:
+Docker Compose is the recommended local relay setup. This repository includes
+`compose.yaml`, which points at the public GHCR image and sets
+`pull_policy: always`, so `docker compose up` checks for the latest image by
+default:
+
+```bash
+docker compose up -d
+```
+
+Open <http://127.0.0.1:8777/> after the container starts. Stop it with:
+
+```bash
+docker compose down
+```
+
+To see startup and relay logs:
+
+```bash
+docker compose logs -f
+```
+
+The published image is:
+`ghcr.io/911218sky/llm-concurrency-test:latest`.
+
+### Docker: run the published image directly
+
+```bash
+docker run --rm -p 127.0.0.1:8777:8777 \
+  ghcr.io/911218sky/llm-concurrency-test:latest
+```
+
+### Build locally
+
+Use this when developing the relay or when you do not want to use GHCR:
 
 ```bash
 docker build -t llm-concurrency-test .
 docker run --rm -p 127.0.0.1:8777:8777 llm-concurrency-test
 ```
 
-After the GitHub Actions workflow runs on `main`, pull the published image:
+### Run without Docker
+
+The page itself is a single `index.html`. Open it directly, or serve the
+repository with Python:
 
 ```bash
-docker run --rm -p 127.0.0.1:8777:8777 ghcr.io/911218sky/llm-concurrency-test:latest
+python3 -m http.server 8000
 ```
 
-Then open `http://127.0.0.1:8777/`. The page sends API requests through the
-local container, while API keys remain on your machine.
+Then visit <http://127.0.0.1:8000/>. This mode does not enable the local relay.
 
-Every push also builds a Docker image through GitHub Actions. Download the
-`llm-concurrency-test-image` artifact from the successful workflow run, then
-load it locally:
+## Configure a test
 
-```bash
-gunzip llm-concurrency-test.tar.gz
-docker load -i llm-concurrency-test.tar
-docker run --rm -p 127.0.0.1:8777:8777 llm-concurrency-test:YOUR_COMMIT_SHA
-```
+Enter the following values in the page:
 
-## Features
+| Field | Example |
+| --- | --- |
+| API key | `sk-...` or your provider's key |
+| Endpoint URL | `https://api.openai.com/v1` |
+| Model | `gpt-4o-mini` or `claude-haiku-4-5` |
+| Concurrency | `5` to start |
+| Max tokens | `200` |
+| Timeout | `60` seconds |
 
-- **Streaming + time-to-first-token.** Both providers are queried with
-  `stream: true`; the timeline chart and per-request detail populate as each
-  request's first chunk arrives.
-- **Live timeline.** The chart updates in real time during a run — wait →
-  first chunk → completion segments per request, no waiting for `Promise.all`.
-- **Overlap-ratio verdict.** `sum-of-durations / wall-time` is compared to
-  the requested concurrency and labeled **concurrent**, **partial**, or
-  **sequential**.
-- **Model picker.** Click "Fetch models" next to the MODEL label and the
-  page will call `/v1/models` on the configured endpoint, then populate a
-  dropdown next to the input. The text input stays editable — you can
-  still type custom model names.
-- **Export.** One-click JSON or CSV download of the entire run, plus a
-  "Copy summary" button that puts the same JSON on the clipboard.
-- **Light/heavy presets.** One-click config for a 3-request smoke test or a
-  15-request stress test.
-- **Dark mode.** Persisted per browser.
-- **No persistence of test history** beyond your API key and config in
-  `localStorage`. Each run lives only in the current DOM.
+The endpoint is resolved when the field loses focus. Paste either a provider
+base URL or a complete chat endpoint. Use **Fetch models** to load
+`/v1/models`; the model field remains editable for custom model names.
 
-## Configuring the page
+Start with the light preset to verify connectivity, then use the heavy preset
+for a larger run. The result includes per-request timing, TTFT, a live
+timeline, and an overlap-ratio label:
 
-The page is a single `index.html`. You can run it three ways:
+- **Concurrent:** requests substantially overlap.
+- **Partial:** some overlap is present, but less than requested.
+- **Sequential:** requests mostly wait for one another.
 
-- **Use the hosted copy** at the URL above — no setup required.
-- **Open the file directly** in your browser (loads over `file://`).
-- **Serve it locally:**
-  ```bash
-  python3 -m http.server 8000
-  # then visit http://localhost:8000/
-  ```
+Export a run as JSON or CSV, or copy its JSON summary. Test history is not
+stored; only the current API key and configuration may be kept in browser
+`localStorage`.
 
-Once it's open, fill in:
+## When the API blocks CORS
 
-| Field         | Example                                    |
-| ------------- | ------------------------------------------ |
-| API key       | `sk-...` or your provider's key            |
-| Endpoint URL  | `https://api.openai.com/v1`                |
-| Model         | `gpt-4o-mini`, `claude-haiku-4-5`, etc.    |
-| Concurrency   | 5 (start small)                            |
-| Max tokens    | 200                                        |
-| Timeout       | 60 seconds                                 |
+Browser-origin requests can fail even when the API works from `curl`. Use the
+Docker Compose setup above, then open the page from
+<http://127.0.0.1:8777/>. The local server serves the page and relays requests
+through `/_llmct/proxy`, so the API endpoint sees a local server request rather
+than a browser-origin request.
 
-Click **RUN TEST**.
-
-The auto-resolved endpoint on blur means you can paste a base URL
-(`https://api.openai.com/v1`) and the page will fill in the right
-`/chat/completions` or `/v1/messages` for you. Toggling between
-OpenAI and Anthropic provider buttons no longer rewrites an already-resolved
-endpoint, so your URL is preserved.
-
-## CORS bypass (Chrome extension)
-
-If your API provider doesn't allow browser-origin requests, every test will
-fail with a generic network error. Install the bundled extension to relay
-requests through a background service worker:
+The bundled Chrome MV3 extension is an alternative when you want to keep using
+the hosted page:
 
 1. Open `chrome://extensions`.
-2. Toggle **Developer mode** on (top-right).
-3. Click **Load unpacked** and select the `extension/` folder from this repo.
-4. Reload the page. The yellow "Requests blocked by CORS?" banner will
-   disappear; from then on, `llmctFetch` routes requests through the
-   extension.
+2. Enable **Developer mode**.
+3. Select **Load unpacked** and choose this repository's `extension/` folder.
+4. Reload the hosted page.
 
-The extension only acts on pages matching its `content_scripts.matches`
-pattern in `manifest.json` — by default, `*.github.io`, `localhost`, and
-`127.0.0.1`. Edit the pattern if you serve the page elsewhere.
+The extension does not log, store, or transmit request contents. It requires
+`<all_urls>` host permission so it can relay to any endpoint you configure.
+See [`extension/README.md`](extension/README.md) for the protocol and the full
+permissions rationale.
 
-**Privacy.** The extension requests `host_permissions: ["<all_urls>"]` so the
-background service worker can call any API regardless of CORS. It does not
-log, store, or transmit request contents. All traffic stays between your
-browser, the page, and the endpoint you configured.
+## Repository layout
 
-See [`extension/README.md`](extension/README.md) for the wire protocol,
-permissions rationale, and limitations.
-
-## Repo layout
-
-```
+```text
 .
-├── README.md            ← this file
-├── CLAUDE.md            ← project notes for AI assistants (and humans)
-├── LICENSE              ← MIT license (free for commercial + personal use)
-├── index.html           ← the entire web app (HTML + inline CSS + JS)
-├── extension/
-│   ├── manifest.json    ← MV3 manifest
-│   ├── content.js       ← injects bridge flag, relays page requests
-│   ├── background.js    ← service worker; CORS-bypassed fetch relay
-│   └── README.md        ← install, privacy, wire protocol
-└── .gitignore
+├── index.html             # Browser application
+├── server.py              # Local static server and API relay
+├── Dockerfile             # Local relay image
+├── compose.yaml           # GHCR Compose deployment
+├── extension/             # Optional Chrome CORS relay
+├── CLAUDE.md              # Project notes
+└── LICENSE                # MIT license
 ```
+
+Every push to `main` builds and publishes the Docker image through GitHub
+Actions. The image is intended for local use and binds to loopback by default
+in the provided Compose and `docker run` examples.
 
 ## License
 
-[MIT](LICENSE). Free for commercial and personal use. See
-[`LICENSE`](LICENSE) for the full text.
+[MIT](LICENSE). Free for commercial and personal use.
