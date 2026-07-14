@@ -222,13 +222,13 @@
     <div class="text-xs font-bold uppercase tracking-widest mb-2" style="color: var(--text-dim);">LLM API • LOAD TEST • CLIENT-SIDE</div>
     <h2 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4 tracking-tight">LLM Concurrency <br/> Test</h2>
     <p class="text-lg font-medium px-4" style="color: var(--text-dim);">
-      Fires N simultaneous requests directly from your browser and measures whether they run in parallel.
+      Fires N simultaneous requests and measures whether they run in parallel. Local mode automatically relays API calls through this machine to avoid browser CORS failures.
     </p>
   </div>
 
   <div class="max-w-4xl w-full mb-4 relative z-10">
     <div class="neo-border p-4 text-sm font-medium leading-relaxed" style="background-color: var(--bg-warn);">
-      Runs entirely in your browser — no server, no relay. This only works if the API allows cross-origin (CORS) requests from a browser. If it doesn't, every request below will fail with a generic network/CORS error and there is no client-side fix for that; you'd need a server-side proxy instead. Your API key is stored only in this browser's localStorage and sent directly to the endpoint you configure — fine for ad-hoc testing, not for a key you intend to keep fully secret.
+      Your API key stays in this browser. On the local deployment, requests go through the local relay automatically, so providers do not need browser CORS support. Fill in the API key and endpoint, then leave the field to load available models automatically.
     </div>
   </div>
 
@@ -340,6 +340,7 @@
 </main>
 
 <script>
+window.__llmctLocalRelay = false;
 /* ---------- Theme ---------- */
 function toggleTheme() {
   const html = document.documentElement;
@@ -359,11 +360,12 @@ function loadField(key) {
   try { return localStorage.getItem('llmct_' + key); } catch (e) { return null; }
 }
 
-/* ---------- Transport shim (extension relay + fetch fallback) ----------
+/* ---------- Transport shim (local relay + extension relay + fetch fallback) ----------
  * When the Chrome extension's content script has set window.__llmctExtensionBridge,
  * page-side fetches are relayed through a background service worker that has
  * host_permissions to all URLs — bypassing the browser's same-origin policy.
- * Otherwise we fall back to plain fetch() and accept the browser's CORS rules.
+ * On the local deployment, requests go through /_llmct/proxy so CORS is not
+ * required. The hosted page still uses the extension or direct fetch fallback.
  *
  * Wire protocol (page ↔ content script):
  *   page → content (postMessage): { type: 'llmct:fetch', id, url, method, headers, body }
@@ -398,6 +400,28 @@ window.addEventListener('message', (e) => {
 });
 
 async function llmctFetch(url, init) {
+  const isLocalPage = !!window.__llmctLocalRelay || ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+  if (isLocalPage && !window.__llmctExtensionBridge) {
+    const method = (init && init.method) || 'GET';
+    const headers = {};
+    if (init && init.headers) {
+      if (init.headers instanceof Headers) {
+        init.headers.forEach((v, k) => { headers[k] = v; });
+      } else if (Array.isArray(init.headers)) {
+        init.headers.forEach(([k, v]) => { headers[k] = v; });
+      } else {
+        Object.assign(headers, init.headers);
+      }
+    }
+    const body = init && init.body !== undefined && init.body !== null ? init.body : null;
+    if (body !== null && typeof body !== 'string') return fetch(url, init);
+    return fetch('/_llmct/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, method, headers, body }),
+      signal: init && init.signal,
+    });
+  }
   if (!window.__llmctExtensionBridge) {
     return fetch(url, init);
   }
@@ -499,7 +523,16 @@ async function fetchModels() {
     status.textContent = ids.length + ' model' + (ids.length === 1 ? '' : 's') + ' loaded.';
   } catch (e) {
     status.style.color = 'var(--text-danger)';
-    status.textContent = 'Failed: ' + (e.message || String(e));
+    const message = e && e.message ? e.message : String(e);
+    if (message.includes('401') || message.includes('403')) {
+      status.textContent = 'API Key 無效或沒有模型列表權限。';
+    } else if (message.includes('404')) {
+      status.textContent = '找不到 /v1/models，請確認這是 OpenAI-compatible Base URL。';
+    } else if (message.toLowerCase().includes('failed to fetch')) {
+      status.textContent = '無法連線到 API。請確認 URL、VPN 或本機 relay。';
+    } else {
+      status.textContent = 'Failed: ' + message;
+    }
     select.style.display = 'none';
   } finally {
     btn.disabled = false;
@@ -590,19 +623,27 @@ function validateRunButton() {
       saveField('endpoint', e.target.value);
       validateRunButton();
     });
+    const scheduleAutoFetchModels = () => {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const endpoint = endpointEl.value.trim();
+      if (!apiKey || !endpoint || document.getElementById('fetchModelsBtn').disabled) return;
+      window.setTimeout(() => fetchModels(), 0);
+    };
     endpointEl.addEventListener('blur', (e) => {
       e.target.value = normalizeEndpoint(currentProvider, e.target.value);
       saveField('endpoint', e.target.value);
       validateRunButton();
+      scheduleAutoFetchModels();
     });
+    document.getElementById('apiKey').addEventListener('blur', scheduleAutoFetchModels);
 
     validateRunButton();
 
-    // Show the CORS-bypass banner only if the extension bridge is not present.
+    // Show the CORS-bypass banner only if neither local relay nor extension is present.
     // The content script (extension/content.js) sets window.__llmctExtensionBridge = true
     // at document_start. We re-check after a tick in case it was injected late.
     const showCorsBanner = () => {
-      const hasBridge = !!(window.__llmctExtensionBridge);
+      const hasBridge = !!(window.__llmctExtensionBridge) || !!window.__llmctLocalRelay || ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
       const banner = document.getElementById('corsBanner');
       if (banner) banner.classList.toggle('hidden', hasBridge);
     };
