@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import os
 import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -126,8 +127,10 @@ class LocalHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    server = ThreadingHTTPServer(("127.0.0.1", 8777), LocalHandler)
-    print("LLM Concurrency Test: http://127.0.0.1:8777/")
+    host = os.environ.get("LLMCT_HOST", "127.0.0.1")
+    port = int(os.environ.get("LLMCT_PORT", "8777"))
+    server = ThreadingHTTPServer((host, port), LocalHandler)
+    print(f"LLM Concurrency Test: http://{host}:{port}/")
     print("Local API relay: enabled at /_llmct/proxy")
     try:
         server.serve_forever()

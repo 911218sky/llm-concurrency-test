@@ -21,6 +21,28 @@ so the same-origin policy no longer applies.
 That's it — open the URL, paste your API key + endpoint + model, hit
 **RUN TEST**.
 
+## Local Docker relay
+
+For APIs that block browser CORS, run the local relay in Docker:
+
+```bash
+docker build -t llm-concurrency-test .
+docker run --rm -p 127.0.0.1:8777:8777 llm-concurrency-test
+```
+
+Then open `http://127.0.0.1:8777/`. The page sends API requests through the
+local container, while API keys remain on your machine.
+
+Every push also builds a Docker image through GitHub Actions. Download the
+`llm-concurrency-test-image` artifact from the successful workflow run, then
+load it locally:
+
+```bash
+gunzip llm-concurrency-test.tar.gz
+docker load -i llm-concurrency-test.tar
+docker run --rm -p 127.0.0.1:8777:8777 llm-concurrency-test:YOUR_COMMIT_SHA
+```
+
 ## Features
 
 - **Streaming + time-to-first-token.** Both providers are queried with
