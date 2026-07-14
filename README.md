@@ -30,6 +30,12 @@ docker build -t llm-concurrency-test .
 docker run --rm -p 127.0.0.1:8777:8777 llm-concurrency-test
 ```
 
+After the GitHub Actions workflow runs on `main`, pull the published image:
+
+```bash
+docker run --rm -p 127.0.0.1:8777:8777 ghcr.io/911218sky/llm-concurrency-test:latest
+```
+
 Then open `http://127.0.0.1:8777/`. The page sends API requests through the
 local container, while API keys remain on your machine.
 
