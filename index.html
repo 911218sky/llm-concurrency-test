@@ -929,6 +929,24 @@ function capabilityValue(model, paths, fallbackMatcher) {
   return null;
 }
 
+function modelRequestHeaders(provider, apiKey) {
+  if (provider === 'anthropic') {
+    return {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    };
+  }
+  if (provider === 'gemini') return { 'x-goog-api-key': apiKey };
+  return { 'Authorization': 'Bearer ' + apiKey };
+}
+
+function modelNeedsPublicMetadata(model) {
+  const context = readModelField(model, ['context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit', 'top_provider.context_length']);
+  const output = readModelField(model, ['max_output_tokens', 'max_completion_tokens', 'outputTokenLimit', 'output_token_limit', 'top_provider.max_completion_tokens', 'top_provider.max_output_tokens']);
+  return context === null || output === null;
+}
+
 function fetchPublicModelCatalog() {
   if (!publicModelCatalogPromise) {
     publicModelCatalogPromise = fetch('https://models.dev/api.json')
@@ -974,19 +992,13 @@ function publicModelMetadataFromCandidate(candidate) {
   };
 }
 
-function publicCatalogModels(catalog) {
-  const models = new Map();
-  for (const [providerId, provider] of Object.entries(catalog)) {
-    for (const candidate of Object.values(provider.models || {})) {
-      const id = canonicalModelId(candidate.id);
-      if (!id) continue;
-      const existing = models.get(id);
-      const preferredProvider = id.startsWith('claude-') ? 'anthropic' : id.startsWith('gpt-') ? 'openai' : '';
-      if (existing && providerId !== preferredProvider) continue;
-      models.set(id, Object.assign({ id, displayName: candidate.name, owned_by: provider.name || providerId }, publicModelMetadataFromCandidate(candidate)));
-    }
-  }
-  return Array.from(models.values());
+async function enrichModelsWithPublicMetadata(models) {
+  const catalog = await fetchPublicModelCatalog();
+  return models.map((model) => {
+    if (!modelNeedsPublicMetadata(model)) return model;
+    const metadata = publicModelMetadata(catalog, modelId(model));
+    return metadata ? Object.assign({}, metadata, model) : model;
+  });
 }
 
 function formatCapability(value) {
@@ -1076,12 +1088,26 @@ function renderModelCatalog() {
 }
 
 async function fetchModels() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const endpoint = document.getElementById('endpoint').value.trim();
   const status = document.getElementById('modelsStatus');
   const picker = document.getElementById('modelPicker');
   const pickerOptions = document.getElementById('modelPickerOptions');
   const pickerCount = document.getElementById('modelPickerCount');
   const btn = document.getElementById('fetchModelsBtn');
-  const url = 'https://models.dev/api.json';
+  if (!apiKey || !endpoint) {
+    status.style.color = 'var(--text-danger)';
+    status.textContent = t('setCredentials');
+    return;
+  }
+  let base;
+  if (currentProvider === 'gemini') {
+    base = normalizeGeminiBase(endpoint);
+  } else {
+    base = endpointBase(endpoint);
+    if (!/\/v1$/i.test(base)) base = base.replace(/\/+$/, '') + '/v1';
+  }
+  const url = base.replace(/\/+$/, '') + '/models';
 
   btn.disabled = true;
   const originalLabel = btn.textContent;
@@ -1090,9 +1116,13 @@ async function fetchModels() {
   status.textContent = t('modelsRequest', { url: url });
 
   try {
-    const list = publicCatalogModels(await fetchPublicModelCatalog());
+    const res = await llmctFetch(url, { method: 'GET', headers: modelRequestHeaders(currentProvider, apiKey) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const list = Array.isArray(data.data) ? data.data : (Array.isArray(data.models) ? data.models : []);
     if (list.length === 0) throw new Error('Empty model list — unexpected response shape.');
-    modelCatalog = new Map(list.map(model => [modelId(model), model]).filter(([id]) => id));
+    const enrichedModels = await enrichModelsWithPublicMetadata(list).catch(() => list);
+    modelCatalog = new Map(enrichedModels.map(model => [modelId(model), model]).filter(([id]) => id));
     const ids = Array.from(modelCatalog.keys()).sort();
     // Build the picker with native buttons so its open menu follows the app theme.
     pickerOptions.replaceChildren();
