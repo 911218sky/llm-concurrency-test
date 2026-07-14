@@ -929,40 +929,6 @@ function capabilityValue(model, paths, fallbackMatcher) {
   return null;
 }
 
-function modelRequestHeaders(provider, apiKey) {
-  if (provider === 'anthropic') {
-    return {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    };
-  }
-  if (provider === 'gemini') return { 'x-goog-api-key': apiKey };
-  return { 'Authorization': 'Bearer ' + apiKey };
-}
-
-function modelDetailEndpoint(provider, raw, id) {
-  if (provider === 'gemini') return normalizeGeminiBase(raw) + '/models/' + encodeURIComponent(id);
-  let base = endpointBase(raw);
-  if (!/\/v1$/i.test(base)) base = base.replace(/\/+$/, '') + '/v1';
-  return base.replace(/\/+$/, '') + '/models/' + encodeURIComponent(id);
-}
-
-function modelNeedsRemoteDetails(model) {
-  return readModelField(model, [
-    'context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit',
-    'outputTokenLimit', 'output_token_limit', 'max_output_tokens', 'max_completion_tokens',
-    'top_provider.context_length', 'top_provider.max_completion_tokens', 'pricing.prompt',
-    'description', 'architecture.input_modalities', 'supported_parameters', 'supportedGenerationMethods',
-  ]) === null;
-}
-
-function modelNeedsPublicMetadata(model) {
-  const context = readModelField(model, ['context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit', 'top_provider.context_length']);
-  const output = readModelField(model, ['max_output_tokens', 'max_completion_tokens', 'outputTokenLimit', 'output_token_limit', 'top_provider.max_completion_tokens', 'top_provider.max_output_tokens']);
-  return context === null || output === null;
-}
-
 function fetchPublicModelCatalog() {
   if (!publicModelCatalogPromise) {
     publicModelCatalogPromise = fetch('https://models.dev/api.json')
@@ -978,8 +944,7 @@ function fetchPublicModelCatalog() {
   return publicModelCatalogPromise;
 }
 
-async function loadPublicModelMetadata(id) {
-  const catalog = await fetchPublicModelCatalog();
+function publicModelMetadata(catalog, id) {
   const wanted = canonicalModelId(id);
   const preferredProvider = wanted.startsWith('claude-') ? 'anthropic' : wanted.startsWith('gpt-') ? 'openai' : '';
   let match = null;
@@ -993,6 +958,10 @@ async function loadPublicModelMetadata(id) {
   }
   if (!match) return null;
   const { candidate } = match;
+  return publicModelMetadataFromCandidate(candidate);
+}
+
+function publicModelMetadataFromCandidate(candidate) {
   return {
     context_length: candidate.limit && candidate.limit.context,
     max_output_tokens: candidate.limit && candidate.limit.output,
@@ -1003,6 +972,21 @@ async function loadPublicModelMetadata(id) {
     structured_outputs: candidate.structured_output,
     _metadataSource: 'models.dev',
   };
+}
+
+function publicCatalogModels(catalog) {
+  const models = new Map();
+  for (const [providerId, provider] of Object.entries(catalog)) {
+    for (const candidate of Object.values(provider.models || {})) {
+      const id = canonicalModelId(candidate.id);
+      if (!id) continue;
+      const existing = models.get(id);
+      const preferredProvider = id.startsWith('claude-') ? 'anthropic' : id.startsWith('gpt-') ? 'openai' : '';
+      if (existing && providerId !== preferredProvider) continue;
+      models.set(id, Object.assign({ id, displayName: candidate.name, owned_by: provider.name || providerId }, publicModelMetadataFromCandidate(candidate)));
+    }
+  }
+  return Array.from(models.values());
 }
 
 function formatCapability(value) {
@@ -1088,70 +1072,16 @@ function renderModelCatalog() {
       + '<button type="button" class="model-card-action" data-use-model="' + escapeHtml(id) + '">' + escapeHtml(t('useModel')) + '</button></article>';
   }).join('');
   grid.querySelectorAll('[data-use-model]').forEach((button) => button.addEventListener('click', () => selectModel(button.dataset.useModel)));
-  grid.querySelectorAll('[data-model-detail-id]').forEach((details) => details.addEventListener('toggle', () => {
-    if (details.open && !details.dataset.loaded && (modelNeedsRemoteDetails(modelCatalog.get(details.dataset.modelDetailId)) || modelNeedsPublicMetadata(modelCatalog.get(details.dataset.modelDetailId)))) loadModelDetails(details.dataset.modelDetailId, details);
-  }));
   view.classList.remove('hidden');
 }
 
-async function loadModelDetails(id, details) {
-  const model = modelCatalog.get(id);
-  const body = details.querySelector('[data-model-detail-body]');
-  if (!model || !body || details.dataset.loading) return;
-  details.dataset.loading = 'true';
-  body.insertAdjacentHTML('afterbegin', '<p class="model-detail-loading">' + escapeHtml(t('loadingDetails')) + '</p>');
-  let merged = model;
-  let providerError = null;
-  try {
-    const endpoint = modelDetailEndpoint(currentProvider, document.getElementById('endpoint').value.trim(), id);
-    const res = await llmctFetch(endpoint, { method: 'GET', headers: modelRequestHeaders(currentProvider, document.getElementById('apiKey').value.trim()) });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const detail = data && (data.data || data.model || data);
-    if (!detail || typeof detail !== 'object' || Array.isArray(detail)) throw new Error('Unexpected model detail response');
-    merged = Object.assign({}, model, detail);
-  } catch (error) {
-    providerError = error;
-  }
-  try {
-    if (modelNeedsPublicMetadata(merged)) {
-      const publicMetadata = await loadPublicModelMetadata(id);
-      if (publicMetadata) merged = Object.assign({}, publicMetadata, merged);
-    }
-    modelCatalog.set(id, merged);
-    body.innerHTML = modelDetailMarkup(merged);
-    if (providerError && merged === model) body.insertAdjacentHTML('beforeend', '<p class="model-detail-error">' + escapeHtml(t('detailsUnavailable')) + '</p>');
-  } catch (error) {
-    modelCatalog.set(id, merged);
-    body.innerHTML = modelDetailMarkup(merged) + '<p class="model-detail-error">' + escapeHtml(t('detailsUnavailable')) + '</p>';
-  } finally {
-    details.dataset.loading = '';
-    details.dataset.loaded = 'true';
-  }
-}
-
 async function fetchModels() {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  const endpoint = document.getElementById('endpoint').value.trim();
   const status = document.getElementById('modelsStatus');
   const picker = document.getElementById('modelPicker');
   const pickerOptions = document.getElementById('modelPickerOptions');
   const pickerCount = document.getElementById('modelPickerCount');
   const btn = document.getElementById('fetchModelsBtn');
-  if (!apiKey || !endpoint) {
-    status.style.color = 'var(--text-danger)';
-    status.textContent = t('setCredentials');
-    return;
-  }
-  // Strip the trailing path to derive the provider model-list URL.
-  let base;
-  if (currentProvider === 'gemini') {
-    base = normalizeGeminiBase(endpoint);
-  } else {
-    base = endpointBase(endpoint);
-    if (!/\/v1$/i.test(base)) base = base.replace(/\/+$/, '') + '/v1';
-  }
-  const url = base.replace(/\/+$/, '') + '/models';
+  const url = 'https://models.dev/api.json';
 
   btn.disabled = true;
   const originalLabel = btn.textContent;
@@ -1159,29 +1089,9 @@ async function fetchModels() {
   status.style.color = 'var(--text-dim)';
   status.textContent = t('modelsRequest', { url: url });
 
-  let headers;
-  if (currentProvider === 'anthropic') {
-    headers = {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    };
-  } else if (currentProvider === 'gemini') {
-    headers = { 'x-goog-api-key': apiKey };
-  } else {
-    headers = { 'Authorization': 'Bearer ' + apiKey };
-  }
-
   try {
-    const res = await llmctFetch(url, { method: 'GET', headers });
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
-      throw new Error('HTTP ' + res.status + (errText ? ' — ' + errText.slice(0, 200) : ''));
-    }
-    const data = await res.json();
-    const list = Array.isArray(data.data) ? data.data : (Array.isArray(data.models) ? data.models : []);
+    const list = publicCatalogModels(await fetchPublicModelCatalog());
     if (list.length === 0) throw new Error('Empty model list — unexpected response shape.');
-    // Keep the full provider objects so rich model catalogs can be inspected.
     modelCatalog = new Map(list.map(model => [modelId(model), model]).filter(([id]) => id));
     const ids = Array.from(modelCatalog.keys()).sort();
     // Build the picker with native buttons so its open menu follows the app theme.
