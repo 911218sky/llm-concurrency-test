@@ -1409,15 +1409,14 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       body: JSON.stringify(bodyObj),
       signal: controller.signal,
     });
-    const endPerf = performance.now();
-    const duration = (endPerf - startPerf) / 1000;
     result.http_status = res.status;
-    result.end_offset_s = +((endPerf - testStart) / 1000).toFixed(3);
-    result.end_iso = new Date().toISOString();
-    result.duration_s = +duration.toFixed(3);
 
     if (!res.ok) {
       clearTimeout(timer);
+      const endPerf = performance.now();
+      result.end_offset_s = +((endPerf - testStart) / 1000).toFixed(3);
+      result.end_iso = new Date().toISOString();
+      result.duration_s = +((endPerf - startPerf) / 1000).toFixed(3);
       result.status = 'http_error';
       result.error = (await res.text()).slice(0, 300);
       onEvent({ type: 'end', result });
@@ -1498,6 +1497,16 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       }
     };
 
+    const processOpenAIJson = (rawResponse) => {
+      if (cfg.provider !== 'openai') return false;
+      try {
+        handleOpenAIChunk(JSON.parse(rawResponse));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) {
@@ -1518,14 +1527,20 @@ async function callOnce(idx, cfg, testStart, onEvent) {
 
     // Some providers close immediately after the final data line without `\n\n`.
     processSseEvent(buffer);
+    const receivedJsonResponse = chunkCount === 0 && processOpenAIJson(buffer);
 
     clearTimeout(timer);
+    const endPerf = performance.now();
+    const duration = (endPerf - startPerf) / 1000;
+    result.end_offset_s = +((endPerf - testStart) / 1000).toFixed(3);
+    result.end_iso = new Date().toISOString();
+    result.duration_s = +duration.toFixed(3);
     result.completion_tokens = completionTokens;
     // If we never saw a usage chunk, fall back to nothing — tokens_per_sec stays 0
     // and the duration is reported via the timeline. Don't fabricate.
     result.tokens_per_sec = duration > 0 ? +(completionTokens / duration).toFixed(2) : 0;
     result.status = 'success';
-    result.stream_status = chunkCount > 0 ? 'ok' : 'empty';
+    result.stream_status = receivedJsonResponse ? 'non_sse_json' : (chunkCount > 0 ? 'ok' : 'empty');
     onEvent({ type: 'end', result });
     return result;
   } catch (e) {
