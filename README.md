@@ -127,6 +127,7 @@ permissions rationale.
 ├── index.html             # Browser application
 ├── server.py              # Local static server and API relay
 ├── Dockerfile             # Local relay image
+├── requirements.txt       # Runtime dependency for UA generation
 ├── compose.yaml           # GHCR Compose deployment
 ├── extension/             # Optional Chrome CORS relay
 ├── CLAUDE.md              # Project notes

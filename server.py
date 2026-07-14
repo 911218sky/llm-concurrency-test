@@ -11,8 +11,14 @@ from urllib.response import addinfourl
 from pathlib import Path
 from typing import Final
 
+import ua_generator
+
 ROOT: Final[Path] = Path(__file__).resolve().parent
 MAX_REQUEST_BYTES: Final[int] = 2 * 1024 * 1024
+DEFAULT_USER_AGENT: Final[str] = ua_generator.generate(
+    device="desktop",
+    browser=["chrome", "edge", "firefox"],
+).text
 HOP_BY_HOP_HEADERS: Final[frozenset[str]] = frozenset({
     "connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
     "te", "trailer", "transfer-encoding", "upgrade",
@@ -111,7 +117,9 @@ class LocalHandler(BaseHTTPRequestHandler):
     @staticmethod
     def _open_upstream(target: tuple[str, str, dict[str, str], bytes | None]) -> addinfourl:
         url, method, headers, body = target
-        request = urllib.request.Request(url, data=body, headers=headers, method=method)
+        upstream_headers = dict(headers)
+        upstream_headers.setdefault("User-Agent", DEFAULT_USER_AGENT)
+        request = urllib.request.Request(url, data=body, headers=upstream_headers, method=method)
         return urllib.request.urlopen(request, timeout=90)
 
     def _send_upstream_error(self, error: urllib.error.HTTPError) -> None:

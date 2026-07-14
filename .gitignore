@@ -5,3 +5,7 @@
 .DS_Store
 Thumbs.db
 *.swp
+
+# Local Python environment
+.venv/
+__pycache__/
