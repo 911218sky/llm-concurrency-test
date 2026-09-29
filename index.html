@@ -232,38 +232,6 @@
   .model-detail-label { color: var(--text-dim); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .model-detail-value { margin-top: 0.2rem; overflow-wrap: anywhere; font-size: 0.9rem; font-weight: 600; }
   .model-details-empty { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
-  .model-catalog { margin-top: 1rem; border: 2px solid var(--border-color); border-radius: 10px; background: var(--bg-header); }
-  .model-catalog-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3.25rem; padding: 0.75rem 1rem; cursor: pointer; list-style: none; }
-  .model-catalog-toggle::-webkit-details-marker { display: none; }
-  .model-catalog-toggle:hover { background: var(--bg-input); }
-  .model-catalog-toggle-meta { display: flex; align-items: center; gap: 0.65rem; }
-  .model-catalog-chevron { width: 0.55rem; height: 0.55rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; color: var(--text-dim); transform: rotate(45deg) translateY(-2px); transition: transform 0.15s ease; }
-  .model-catalog[open] .model-catalog-chevron { transform: rotate(225deg) translateY(-2px); }
-  .model-catalog-title { margin: 0; font-size: 0.95rem; font-weight: 800; }
-  .model-catalog-body { padding: 0 1rem 1rem; }
-  .model-catalog-subtitle { margin: 0 0 1rem; color: var(--text-dim); font-size: 0.78rem; }
-  .model-catalog-count { flex: 0 0 auto; padding: 0.3rem 0.55rem; border: 1px solid var(--border-color); border-radius: 999px; color: var(--text-dim); font-size: 0.72rem; font-weight: 800; }
-  .model-catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.75rem; }
-  .model-card { min-width: 0; padding: 1rem; border: 2px solid var(--border-color); border-radius: 10px; background: var(--bg-input); }
-  .model-card.is-selected { border-color: var(--accent-yellow); box-shadow: inset 0 0 0 1px var(--accent-yellow); }
-  .model-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
-  .model-card-name { margin: 0; overflow-wrap: anywhere; font-size: 0.95rem; font-weight: 800; }
-  .model-card-id { margin: 0.2rem 0 0; overflow-wrap: anywhere; color: var(--text-dim); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.7rem; }
-  .model-card-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin: 1rem 0; }
-  .model-card-metric { min-width: 0; }
-  .model-card-metric-label { color: var(--text-dim); font-size: 0.67rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
-  .model-card-metric-value { margin-top: 0.15rem; overflow-wrap: anywhere; font-size: 0.82rem; font-weight: 700; }
-  .model-capability-list { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.9rem; }
-  .model-capability-chip { padding: 0.25rem 0.45rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-panel); color: var(--text-dim); font-size: 0.68rem; font-weight: 700; }
-  .model-card-details { border-top: 1px solid var(--border-color); }
-  .model-card-details summary { padding: 0.7rem 0; cursor: pointer; color: var(--text); font-size: 0.78rem; font-weight: 800; list-style: none; }
-  .model-card-details summary::-webkit-details-marker { display: none; }
-  .model-card-details summary::after { content: '+'; float: right; color: var(--text-dim); font-size: 1rem; }
-  .model-card-details[open] summary::after { content: '−'; }
-  .model-card-details .model-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-bottom: 0.8rem; }
-  .model-card-action { width: 100%; padding: 0.55rem 0.7rem; border: 2px solid var(--border-color); border-radius: 7px; background: var(--accent-yellow); color: var(--text); font-size: 0.75rem; font-weight: 800; cursor: pointer; }
-  .model-card-action:hover { filter: brightness(0.97); }
-  .model-detail-loading, .model-detail-error { margin: 0 0 0.8rem; color: var(--text-dim); font-size: 0.78rem; line-height: 1.5; }
   @media (max-width: 640px) { .model-catalog-header { flex-direction: column; } .model-catalog-count { align-self: flex-start; } }
   .model-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: stretch; }
   .model-row > #model { flex: 1 1 12rem; min-width: 0; }
@@ -324,9 +292,7 @@
     .model-row > #model, .model-picker { flex: 1 1 auto; width: 100%; min-width: 0; }
     .model-picker-options { position: static; max-height: 14rem; box-shadow: none; border-top: 0; }
     .model-picker[open] summary { border-bottom-width: 0; }
-    .model-catalog-grid { grid-template-columns: 1fr; }
-    .model-card-details .model-details-grid { grid-template-columns: 1fr; }
-  }
+      }
 
   .neo-border { border: 2px solid var(--border-color); border-radius: 8px; transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease; }
   .neo-shadow { box-shadow: 0 6px 0 var(--shadow-color); }
@@ -433,9 +399,7 @@
     .provider-btn + .provider-btn { border-left: none; }
     .provider-btn:nth-child(odd) { border-right: 2px solid var(--border-color); }
     .provider-btn:nth-child(n+3) { border-top: 2px solid var(--border-color); }
-    .model-catalog-grid { grid-template-columns: 1fr; }
-    .model-catalog-body { padding: 0 0.75rem 0.75rem; }
-    .profiles-row { flex-direction: column; align-items: stretch; }
+        .profiles-row { flex-direction: column; align-items: stretch; }
     .profiles-actions { width: 100%; }
     .data-table { min-width: 40rem; }
     .stat-grid-mobile { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
@@ -601,23 +565,13 @@
             </details>
           </div>
           <div id="modelsStatus" class="text-xs mt-1" style="color: var(--text-dim);"></div>
-          <details id="modelCatalogView" class="model-catalog hidden" aria-live="polite">
-            <summary class="model-catalog-toggle">
-              <span class="model-catalog-title" data-i18n="modelCatalog">Model catalog</span>
-              <span class="model-catalog-toggle-meta"><span id="modelCatalogCount" class="model-catalog-count"></span><span class="model-catalog-chevron" aria-hidden="true"></span></span>
-            </summary>
-            <div class="model-catalog-body">
-              <p class="model-catalog-subtitle" data-i18n="modelCatalogHint">Browse limits and capabilities before choosing a model.</p>
-              <div id="modelCatalogGrid" class="model-catalog-grid"></div>
-            </div>
-          </details>
         </div>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <label class="label-text" for="concurrency" data-i18n="concurrency">CONCURRENCY</label>
-          <input id="concurrency" class="neo-input w-full" type="number" value="5" min="1" max="50"/>
+          <input id="concurrency" class="neo-input w-full" type="number" value="3" min="1" max="50"/>
         </div>
         <div>
           <label class="label-text" for="maxTokens" data-i18n="maxTokens">MAX TOKENS</label>
@@ -662,10 +616,15 @@
       </div>
 
       <div class="pt-2 flex flex-col md:flex-row justify-between items-center gap-4">
-        <button id="runBtn" class="neo-button neo-button-green text-lg px-8 py-3 w-full md:w-auto text-center flex justify-center items-center gap-2" type="button" onclick="runTest()">
-          <span id="runLabel" data-i18n="runTest">RUN TEST</span>
-          <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-        </button>
+        <div class="flex gap-2 w-full md:w-auto">
+          <button id="runBtn" class="neo-button neo-button-green text-lg px-8 py-3 flex-1 md:flex-none text-center flex justify-center items-center gap-2" type="button" onclick="runTest()">
+            <span id="runLabel" data-i18n="runTest">RUN TEST</span>
+            <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </button>
+          <button id="stopBtn" class="neo-border text-lg px-6 py-3 flex-1 md:flex-none text-center font-bold hidden" type="button" onclick="stopTest()" disabled style="background-color: var(--bg-input); color: var(--text-danger);">
+            <span id="stopLabel" data-i18n="stopTest">STOP</span>
+          </button>
+        </div>
         <div class="flex gap-2 w-full md:w-auto">
           <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('light')" data-i18n="lightLoad">Light load</button>
           <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('heavy')" data-i18n="heavyLoad">Heavy load</button>
@@ -702,14 +661,14 @@ const I18N = {
     model: 'Model', fetchModels: 'Fetch models', fetching: 'Fetching…', modelPlaceholder: 'e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: 'Pick a model…', modelDetailsTitle: 'Model details', modelCatalog: 'Model catalog', modelCatalogHint: 'Browse limits and capabilities before choosing a model.', modelCount: '{count} models', viewDetails: 'Show details', useModel: 'Use this model', capabilitiesNotProvided: 'Capabilities not provided', modelBasics: 'Model information', modelDescription: 'Description', baseModel: 'Base model', version: 'Version',
     contextWindow: 'Context window', maxOutput: 'Max output tokens', inputPrice: 'Input price', outputPrice: 'Output price', owner: 'Owner', created: 'Created', capabilities: 'Capabilities', modalities: 'Modalities', modality: 'Modality', tokenizer: 'Tokenizer', knowledgeCutoff: 'Knowledge cutoff', expirationDate: 'Expiration date', supportedParameters: 'Supported parameters', thinkingSupport: 'Thinking / reasoning', imageInput: 'Image input', audioInput: 'Audio input', videoInput: 'Video input', toolCalling: 'Tool calling', structuredOutput: 'Structured output', streaming: 'Streaming', supported: 'Supported', notSupported: 'Not supported', modelDetailsEmpty: 'This provider returned the model name but no additional metadata.', loadingDetails: 'Loading details…', detailsUnavailable: 'Neither the provider nor the public model catalog returned additional metadata.', providerNotProvided: 'Not provided by provider', metadataSource: 'Metadata source', publicModelCatalog: 'Public model catalog: models.dev', perMillionTokens: '/ 1M tokens',
     concurrency: 'Concurrency', maxTokens: 'Max tokens', timeout: 'Timeout (s)', temperature: 'Temperature', topP: 'Top P', thinkingStrength: 'Thinking strength', thinkingOff: 'Off', thinkingLow: 'Low', thinkingMedium: 'Medium', thinkingHigh: 'High', thinkingHint: "Mapped to each provider's native reasoning or thinking setting.", systemPrompt: 'System prompt', userMessage: 'User message',
-    runTest: 'Run test', runRunning: 'Running…', lightLoad: 'Light load', heavyLoad: 'Heavy load', validation: 'Fill in API key, endpoint, and model before running a test.',
+    runTest: 'Run test', runRunning: 'Running…', stopTest: 'Stop', statusCancelled: 'cancelled', verdictCancelled: 'Cancelled — test stopped by user', lightLoad: 'Light load', heavyLoad: 'Heavy load', validation: 'Fill in API key, endpoint, and model before running a test.',
     setCredentials: 'Set API key and endpoint first.', modelsRequest: 'Loading models from {url}', pickModelCount: 'Pick a model… ({count})', modelsLoadedOne: '1 model loaded.', modelsLoadedMany: '{count} models loaded.',
     invalidCredentials: 'The API key is invalid or cannot access the model list.', modelsNotFound: 'The /v1/models endpoint was not found. Check that this is an OpenAI-compatible base URL.', apiUnavailable: 'The API could not be reached. Check the URL, VPN, or local relay.', failed: 'Failed: {message}',
     wallTime: 'Wall time', successful: 'Successful', totalTokens: 'Total tokens', aggregateTokens: 'Aggregate tokens/sec', overlapRatio: 'Overlap ratio',
     running: 'Running…', completed: '{done} / {total} completed', downloadJson: 'Download JSON', downloadCsv: 'Download CSV', copySummary: 'Copy summary',
     timeline: 'Timeline', runningRange: '(0s → running)', started: 'Started: {time}', startedFinished: 'Started: {start} · Finished: {end}', perRequest: 'Per-request detail',
     tableStart: 'Start', tableEnd: 'End', tableDuration: 'Duration', tableTtft: 'TTFT', tableTokens: 'Tokens', tableTokSec: 'Tok/sec', tableStatus: 'Status', tableNote: 'Note',
-    statusSuccess: 'success', statusTimeout: 'timeout', statusException: 'exception', statusError: 'error', streamNote: 'stream={status}', copied: 'Copied', copyFailed: 'Copy failed',
+    statusSuccess: 'success', statusTimeout: 'timeout', statusException: 'exception', statusError: 'error', statusCancelled: 'cancelled', streamNote: 'stream={status}', copied: 'Copied', copyFailed: 'Copy failed',
     verdictInconclusive: 'Inconclusive — need 2+ successful requests', verdictConcurrent: 'Concurrent — requests processed in parallel', verdictSequential: 'Sequential — requests queued one at a time', verdictPartial: 'Partial concurrency — limited parallelism',
     corsLikely: 'likely CORS — the API blocked this browser origin'
   },
@@ -730,7 +689,7 @@ const I18N = {
     model: '模型', fetchModels: '取得模型', fetching: '取得中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '選擇模型…', modelDetailsTitle: '模型詳細資訊', modelCatalog: '模型總覽', modelCatalogHint: '先比較限制與支援能力，再選擇要測試的模型。', modelCount: '共 {count} 個模型', viewDetails: '顯示詳細資料', useModel: '使用此模型', capabilitiesNotProvided: '服務商未提供能力資料', modelBasics: '模型資訊', modelDescription: '模型描述', baseModel: '基礎模型', version: '版本',
     contextWindow: '最大上下文', maxOutput: '最大輸出 Token', inputPrice: '輸入價格', outputPrice: '輸出價格', owner: '擁有者', created: '建立時間', capabilities: '支援能力', modalities: '支援模態', modality: '模態', tokenizer: 'Tokenizer', knowledgeCutoff: '知識截止日期', expirationDate: '到期日期', supportedParameters: '支援參數', thinkingSupport: '思考／推理', imageInput: '圖片輸入', audioInput: '音訊輸入', videoInput: '影片輸入', toolCalling: '工具呼叫', structuredOutput: '結構化輸出', streaming: '串流輸出', supported: '支援', notSupported: '不支援', modelDetailsEmpty: '服務商只回傳了模型名稱，沒有提供其他中繼資料。', loadingDetails: '正在載入詳細資料…', detailsUnavailable: '服務商與公開模型目錄都沒有提供額外中繼資料。', providerNotProvided: '服務商未提供', metadataSource: '中繼資料來源', publicModelCatalog: '公開模型目錄：models.dev', perMillionTokens: '／每 100 萬 Token',
     concurrency: '並發數', maxTokens: '最大 Token 數', timeout: '逾時（秒）', temperature: 'Temperature', topP: 'Top P', thinkingStrength: '思考強度', thinkingOff: '關閉', thinkingLow: '低', thinkingMedium: '中', thinkingHigh: '高', thinkingHint: '會轉換成各服務商原生的推理或思考設定。', systemPrompt: '系統提示詞', userMessage: '使用者訊息',
-    runTest: '開始測試', runRunning: '測試中…', lightLoad: '輕量負載', heavyLoad: '重度負載', validation: '開始測試前，請填入 API 金鑰、端點與模型。',
+    runTest: '開始測試', runRunning: '測試中…', stopTest: '中斷', statusCancelled: '已中斷', verdictCancelled: '已中斷 — 測試被使用者停止', lightLoad: '輕量負載', heavyLoad: '重度負載', validation: '開始測試前，請填入 API 金鑰、端點與模型。',
     setCredentials: '請先填入 API 金鑰與端點。', modelsRequest: '正在從 {url} 載入模型', pickModelCount: '選擇模型…（{count}）', modelsLoadedOne: '已載入 1 個模型。', modelsLoadedMany: '已載入 {count} 個模型。',
     invalidCredentials: 'API 金鑰無效，或沒有取得模型列表的權限。', modelsNotFound: '找不到 /v1/models，請確認這是 OpenAI 相容的 Base URL。', apiUnavailable: '無法連線到 API，請確認 URL、VPN 或本機 relay。', failed: '失敗：{message}',
     wallTime: '總耗時', successful: '成功數', totalTokens: '總 Token 數', aggregateTokens: '總 Token／秒', overlapRatio: '重疊比例',
@@ -758,7 +717,7 @@ const I18N = {
     model: '模型', fetchModels: '获取模型', fetching: '获取中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '选择模型…', modelDetailsTitle: '模型详细信息', modelCatalog: '模型总览', modelCatalogHint: '先比较限制和支持能力，再选择要测试的模型。', modelCount: '共 {count} 个模型', viewDetails: '显示详细信息', useModel: '使用此模型', capabilitiesNotProvided: '服务商未提供能力资料', modelBasics: '模型信息', modelDescription: '模型描述', baseModel: '基础模型', version: '版本',
     contextWindow: '最大上下文', maxOutput: '最大输出 Token', inputPrice: '输入价格', outputPrice: '输出价格', owner: '所有者', created: '创建时间', capabilities: '支持能力', modalities: '支持模态', modality: '模态', tokenizer: 'Tokenizer', knowledgeCutoff: '知识截止日期', expirationDate: '到期日期', supportedParameters: '支持参数', thinkingSupport: '思考／推理', imageInput: '图片输入', audioInput: '音频输入', videoInput: '视频输入', toolCalling: '工具调用', structuredOutput: '结构化输出', streaming: '流式输出', supported: '支持', notSupported: '不支持', modelDetailsEmpty: '服务商只返回了模型名称，没有提供其他元数据。', loadingDetails: '正在加载详细信息…', detailsUnavailable: '服务商与公开模型目录都没有提供额外元数据。', providerNotProvided: '服务商未提供', metadataSource: '元数据来源', publicModelCatalog: '公开模型目录：models.dev', perMillionTokens: '／每 100 万 Token',
     concurrency: '并发数', maxTokens: '最大 Token 数', timeout: '超时（秒）', temperature: 'Temperature', topP: 'Top P', thinkingStrength: '思考强度', thinkingOff: '关闭', thinkingLow: '低', thinkingMedium: '中', thinkingHigh: '高', thinkingHint: '会转换成各服务商原生的推理或思考设置。', systemPrompt: '系统提示词', userMessage: '用户消息',
-    runTest: '开始测试', runRunning: '测试中…', lightLoad: '轻量负载', heavyLoad: '重度负载', validation: '开始测试前，请填入 API 密钥、端点和模型。',
+    runTest: '开始测试', runRunning: '测试中…', stopTest: '中断', statusCancelled: '已中断', verdictCancelled: '已中断 — 测试被用户停止', lightLoad: '轻量负载', heavyLoad: '重度负载', validation: '开始测试前，请填入 API 密钥、端点和模型。',
     setCredentials: '请先填入 API 密钥和端点。', modelsRequest: '正在从 {url} 加载模型', pickModelCount: '选择模型…（{count}）', modelsLoadedOne: '已加载 1 个模型。', modelsLoadedMany: '已加载 {count} 个模型。',
     invalidCredentials: 'API 密钥无效，或没有获取模型列表的权限。', modelsNotFound: '找不到 /v1/models，请确认这是 OpenAI 兼容的 Base URL。', apiUnavailable: '无法连接到 API，请确认 URL、VPN 或本机 relay。', failed: '失败：{message}',
     wallTime: '总耗时', successful: '成功数', totalTokens: '总 Token 数', aggregateTokens: '总 Token／秒', overlapRatio: '重叠比例',
@@ -782,7 +741,7 @@ function t(key, vars) {
 }
 
 function statusLabel(status) {
-  return ({ success: t('statusSuccess'), timeout: t('statusTimeout'), exception: t('statusException'), error: t('statusError') })[status] || status;
+  return ({ success: t('statusSuccess'), timeout: t('statusTimeout'), exception: t('statusException'), error: t('statusError'), cancelled: t('statusCancelled') })[status] || status;
 }
 
 function applyThemeUi() {
@@ -814,7 +773,6 @@ function applyLanguage(language) {
   if (languagePicker) languagePicker.setAttribute('aria-label', t('language'));
   document.querySelectorAll('.language-option').forEach((option) => option.setAttribute('aria-selected', String(option.dataset.language === currentLanguage)));
   applyThemeUi();
-  if (typeof modelCatalog !== 'undefined' && modelCatalog.size) renderModelCatalog();
   if (typeof renderProfileSelect === 'function') renderProfileSelect();
   if (typeof latestRun !== 'undefined' && latestRun) finalizeRender(latestRun);
 }
@@ -1023,9 +981,7 @@ function newProfile() {
   saveField('endpoint', '');
   saveField('model', '');
   const picker = document.getElementById('modelPicker');
-  const catalog = document.getElementById('modelCatalogView');
   if (picker) picker.classList.add('hidden');
-  if (catalog) catalog.classList.add('hidden');
   const status = document.getElementById('modelsStatus');
   if (status) status.textContent = '';
   modelCatalog = new Map();
@@ -1348,7 +1304,6 @@ function selectModel(value) {
   if (pickerLabel) pickerLabel.textContent = model && (model.displayName || model.name) ? (model.displayName || model.name) : value;
   if (picker) picker.open = false;
   document.querySelectorAll('.model-option').forEach((option) => { option.setAttribute('aria-selected', String(option.dataset.modelId === value)); });
-  document.querySelectorAll('.model-card').forEach((card) => { card.classList.toggle('is-selected', card.dataset.modelId === value); });
   saveField('model', value);
   validateRunButton();
 }
@@ -1387,35 +1342,6 @@ function modelDetailMarkup(model) {
     + '<div class="model-detail-section"><div class="model-detail-section-title">' + escapeHtml(t('modelBasics')) + '</div>'
     + (available.length ? '<div class="model-details-grid">' + available.map(([label, value]) => '<div class="model-detail-item"><div class="model-detail-label">' + escapeHtml(label) + '</div><div class="model-detail-value">' + escapeHtml(formatDetailValue(value)) + '</div></div>').join('') + '</div>' : '<p class="model-details-empty">' + escapeHtml(t('modelDetailsEmpty')) + '</p>')
     + '</div><div class="model-detail-section"><div class="model-detail-section-title">' + escapeHtml(t('capabilities')) + '</div><div class="model-details-grid">' + capabilityGrid + '</div></div>';
-}
-
-function renderModelCatalog() {
-  const view = document.getElementById('modelCatalogView');
-  const grid = document.getElementById('modelCatalogGrid');
-  const count = document.getElementById('modelCatalogCount');
-  if (!view || !grid || !count) return;
-  const ids = Array.from(modelCatalog.keys()).sort();
-  count.textContent = t('modelCount', { count: ids.length });
-  grid.innerHTML = ids.map((id) => {
-    const model = modelCatalog.get(id);
-    const displayName = model.displayName || model.name || id;
-    const context = formatTokenLimit(readModelField(model, ['context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit', 'top_provider.context_length']));
-    const maxOutput = formatTokenLimit(readModelField(model, ['max_output_tokens', 'max_completion_tokens', 'outputTokenLimit', 'output_token_limit', 'top_provider.max_completion_tokens', 'top_provider.max_output_tokens']));
-    const capabilities = [
-      [t('thinkingSupport'), capabilityValue(model, ['thinking', 'supports_thinking', 'supports_reasoning', 'reasoning', 'thinking_support'], (value) => value.includes('reason') || value.includes('thinking'))],
-      [t('imageInput'), capabilityValue(model, ['supports_image_input', 'image_input'], (value) => value.includes('image'))],
-      [t('toolCalling'), capabilityValue(model, ['tool_calling', 'supports_tools', 'supports_function_calling', 'function_calling'], (value) => value.includes('tool') || value.includes('function'))],
-      [t('streaming'), capabilityValue(model, ['streaming', 'supports_streaming'], (value) => value.includes('stream'))],
-    ].filter(([, value]) => value === true).map(([label]) => '<span class="model-capability-chip">' + escapeHtml(label) + '</span>').join('');
-    return '<article class="model-card' + (document.getElementById('model').value.trim() === id ? ' is-selected' : '') + '" data-model-id="' + escapeHtml(id) + '">'
-      + '<div class="model-card-header"><div><h5 class="model-card-name">' + escapeHtml(displayName) + '</h5><p class="model-card-id">' + escapeHtml(id) + '</p></div></div>'
-      + '<div class="model-card-metrics"><div class="model-card-metric"><div class="model-card-metric-label">' + escapeHtml(t('contextWindow')) + '</div><div class="model-card-metric-value">' + escapeHtml(context) + '</div></div><div class="model-card-metric"><div class="model-card-metric-label">' + escapeHtml(t('maxOutput')) + '</div><div class="model-card-metric-value">' + escapeHtml(maxOutput) + '</div></div></div>'
-      + '<div class="model-capability-list">' + (capabilities || '<span class="model-capability-chip">' + escapeHtml(t('capabilitiesNotProvided')) + '</span>') + '</div>'
-      + '<details class="model-card-details" data-model-detail-id="' + escapeHtml(id) + '"><summary>' + escapeHtml(t('viewDetails')) + '</summary><div data-model-detail-body>' + modelDetailMarkup(model) + '</div></details>'
-      + '<button type="button" class="model-card-action" data-use-model="' + escapeHtml(id) + '">' + escapeHtml(t('useModel')) + '</button></article>';
-  }).join('');
-  grid.querySelectorAll('[data-use-model]').forEach((button) => button.addEventListener('click', () => selectModel(button.dataset.useModel)));
-  view.classList.remove('hidden');
 }
 
 async function fetchModels() {
@@ -1471,7 +1397,6 @@ async function fetchModels() {
     });
     pickerCount.textContent = '(' + ids.length + ')';
     picker.classList.remove('hidden');
-    renderModelCatalog();
     const currentModel = document.getElementById('model').value.trim();
     if (currentModel && modelCatalog.has(currentModel)) selectModel(currentModel);
     status.style.color = 'var(--text-success, #14532d)';
@@ -1732,7 +1657,18 @@ async function callOnce(idx, cfg, testStart, onEvent) {
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), cfg.timeout * 1000);
+  const timer = setTimeout(() => controller.abort('timeout'), cfg.timeout * 1000);
+  if (cfg.abortSignal) {
+    if (cfg.abortSignal.aborted) {
+      clearTimeout(timer);
+      controller.abort(cfg.abortSignal.reason || 'cancelled');
+    } else {
+      cfg.abortSignal.addEventListener('abort', () => {
+        clearTimeout(timer);
+        controller.abort(cfg.abortSignal.reason || 'cancelled');
+      }, { once: true });
+    }
+  }
 
   const stampFirstChunk = () => {
     if (result.first_chunk_offset_s !== null) return;
@@ -1890,8 +1826,15 @@ async function callOnce(idx, cfg, testStart, onEvent) {
     result.end_iso = new Date().toISOString();
     result.duration_s = +((endPerf - startPerf) / 1000).toFixed(3);
     if (e.name === 'AbortError' || (e.message || '').toLowerCase().includes('abort')) {
-      result.status = 'timeout';
-      result.error = 'No response within ' + cfg.timeout + 's';
+      const reason = (controller.signal && controller.signal.reason) || (cfg.abortSignal && cfg.abortSignal.reason) || '';
+      const cancelled = reason === 'cancelled' || !!(cfg.abortSignal && cfg.abortSignal.aborted && reason !== 'timeout');
+      if (cancelled) {
+        result.status = 'cancelled';
+        result.error = t('verdictCancelled');
+      } else {
+        result.status = 'timeout';
+        result.error = 'No response within ' + cfg.timeout + 's';
+      }
     } else {
       result.status = 'exception';
       result.error = (e.message || 'Network error') + ' (' + t('corsLikely') + ')';
@@ -1901,17 +1844,47 @@ async function callOnce(idx, cfg, testStart, onEvent) {
   }
 }
 
+let activeRunController = null;
+
+function setRunUi(running) {
+  const btn = document.getElementById('runBtn');
+  const runLabel = document.getElementById('runLabel');
+  const stopBtn = document.getElementById('stopBtn');
+  if (running) {
+    btn.dataset.running = '1';
+    btn.disabled = true;
+    runLabel.textContent = t('runRunning');
+    if (stopBtn) {
+      stopBtn.classList.remove('hidden');
+      stopBtn.disabled = false;
+    }
+  } else {
+    btn.dataset.running = '';
+    runLabel.textContent = t('runTest');
+    if (stopBtn) {
+      stopBtn.classList.add('hidden');
+      stopBtn.disabled = true;
+    }
+    validateRunButton();
+  }
+}
+
+function stopTest() {
+  if (!activeRunController || activeRunController.signal.aborted) return;
+  activeRunController.abort('cancelled');
+  const stopBtn = document.getElementById('stopBtn');
+  if (stopBtn) stopBtn.disabled = true;
+}
+
 async function runTest() {
   if (!validateRunButton()) return;
+  if (activeRunController && !activeRunController.signal.aborted) return;
 
   const endpointEl = document.getElementById('endpoint');
   const rawEndpoint = endpointEl.value.trim();
-
-  const btn = document.getElementById('runBtn');
-  const runLabel = document.getElementById('runLabel');
-  btn.dataset.running = '1';
-  btn.disabled = true;
-  runLabel.textContent = t('runRunning');
+  const runAbort = new AbortController();
+  activeRunController = runAbort;
+  setRunUi(true);
 
   const cfg = {
     provider: currentProvider,
@@ -1926,6 +1899,7 @@ async function runTest() {
     temperature: parseFloat(document.getElementById('temperature').value),
     topP: parseFloat(document.getElementById('topP').value),
     thinkingStrength: document.getElementById('thinkingStrength').value,
+    abortSignal: runAbort.signal,
   };
 
   // Eagerly render the skeleton BEFORE any request fires, so per-request
@@ -1952,6 +1926,7 @@ async function runTest() {
   const testEnd = performance.now();
   const testEndIso = new Date().toISOString();
   const wallTime = +((testEnd - testStart) / 1000).toFixed(3);
+  const cancelled = runAbort.signal.aborted && runAbort.signal.reason === 'cancelled';
 
   const successResults = results.filter(r => r.status === 'success');
   const sumDurations = +successResults.reduce((a, r) => a + r.duration_s, 0).toFixed(3);
@@ -1960,7 +1935,10 @@ async function runTest() {
   const overlapRatio = (wallTime > 0 && sumDurations > 0) ? +(sumDurations / wallTime).toFixed(2) : 0;
 
   let verdict, verdictKind;
-  if (successResults.length <= 1) {
+  if (cancelled) {
+    verdict = t('verdictCancelled');
+    verdictKind = 'warn';
+  } else if (successResults.length <= 1) {
     verdict = t('verdictInconclusive');
     verdictKind = 'warn';
   } else if (overlapRatio >= cfg.concurrency * 0.7) {
@@ -1985,12 +1963,12 @@ async function runTest() {
     overlap_ratio: overlapRatio,
     verdict: verdict,
     verdict_kind: verdictKind,
+    cancelled: cancelled,
     results: results,
   });
 
-  btn.dataset.running = '';
-  runLabel.textContent = t('runTest');
-  validateRunButton();
+  if (activeRunController === runAbort) activeRunController = null;
+  setRunUi(false);
 }
 
 /* ---------- Rendering ---------- */
