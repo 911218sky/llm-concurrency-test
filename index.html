@@ -533,7 +533,7 @@
           <button type="button" class="neo-border" style="background-color: var(--bg-header); color: var(--text-danger);" onclick="deleteCurrentProfile()" data-i18n="profileDelete">Delete</button>
           <button type="button" class="neo-border" style="background-color: var(--bg-header); color: var(--text-danger);" onclick="clearAllProfiles()" data-i18n="profileClearAll">Clear all</button>
         </div>
-        <div class="profiles-hint" data-i18n="profileHint">Save each platform under a custom alias with its own API key. Switching profiles keeps the others. Clear all removes every saved custom profile from this browser.</div>
+        <div class="profiles-hint" data-i18n="profileHint">Give each platform its own alias and Save — a new alias adds another profile; the same alias updates it. Use the dropdown to switch. Clear all removes every saved custom profile from this browser.</div>
         <div id="profileStatus" class="profiles-hint" style="margin-top: 0.25rem;" aria-live="polite"></div>
       </div>
 
@@ -663,7 +663,7 @@ const I18N = {
     corsTitle: 'Requests blocked by CORS?', corsBodyBefore: "If your API provider does not allow browser-origin requests, install the", corsBodyAfter: 'and reload this page. It relays your requests through a background service worker so the browser same-origin policy no longer applies.',
     configuration: 'Test configuration', provider: 'Provider', openaiCompatible: 'OpenAI-compatible', anthropic: 'Anthropic', gemini: 'Gemini',
     profiles: 'Saved profiles', profileNamePlaceholder: 'Alias, e.g. OpenAI / DeepSeek / Work', profileSave: 'Save', profileNew: 'New', profileDelete: 'Delete', profileClearAll: 'Clear all',
-    profileHint: 'Save each platform under a custom alias with its own API key. Switching profiles keeps the others. Clear all removes every saved custom profile from this browser.',
+    profileHint: 'Give each platform its own alias and Save — a new alias adds another profile; the same alias updates it. Use the dropdown to switch. Clear all removes every saved custom profile from this browser.',
     profileNone: 'No saved profiles yet', profileSaved: 'Saved “{name}”.', profileDeleted: 'Deleted “{name}”.', profileCleared: 'All custom profiles cleared.', profileNeedName: 'Enter an alias name before saving.', profileConfirmDelete: 'Delete profile “{name}”?', profileConfirmClear: 'Clear ALL saved custom profiles from this browser?',
     apiKey: 'API key', apiKeyPlaceholder: "sk-... or your provider's API key", endpoint: 'Endpoint URL', endpointPlaceholder: 'Base URL or full endpoint, e.g. https://api.openai.com/v1',
     endpointHint: 'Base URL is resolved when you leave the field (OpenAI → /chat/completions, Anthropic → /v1/messages, Gemini → /v1beta). A full URL you pasted is left untouched.',
@@ -691,7 +691,7 @@ const I18N = {
     corsTitle: '請求被 CORS 阻擋了嗎？', corsBodyBefore: '如果 API 服務商不允許瀏覽器來源請求，請安裝', corsBodyAfter: '並重新載入頁面。它會透過背景 service worker 轉送請求，避開瀏覽器同源政策。',
     configuration: '測試設定', provider: '服務商', openaiCompatible: 'OpenAI 相容', anthropic: 'Anthropic', gemini: 'Gemini',
     profiles: '已存設定（別名）', profileNamePlaceholder: '別名，例如 OpenAI／DeepSeek／公司', profileSave: '儲存', profileNew: '新增', profileDelete: '刪除', profileClearAll: '全部清空',
-    profileHint: '可為不同平台自訂別名並各自保存 API 金鑰；切換時不會覆蓋其他組。全部清空會移除此瀏覽器內所有自訂設定。',
+    profileHint: '為每個平台取一個別名後按「儲存」：新別名會新增一組，同名會更新該組。用下拉選單切換；「全部清空」會移除此瀏覽器內所有自訂設定。',
     profileNone: '尚無已存設定', profileSaved: '已儲存「{name}」。', profileDeleted: '已刪除「{name}」。', profileCleared: '已清空所有自訂設定。', profileNeedName: '請先輸入別名再儲存。', profileConfirmDelete: '確定刪除「{name}」？', profileConfirmClear: '確定清空此瀏覽器內全部自訂設定？',
     apiKey: 'API 金鑰', apiKeyPlaceholder: 'sk-... 或服務商提供的 API 金鑰', endpoint: '端點 URL', endpointPlaceholder: 'Base URL 或完整端點，例如 https://api.openai.com/v1',
     endpointHint: '離開欄位時會補成服務商端點（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已貼上的完整 URL 會保持不變。',
@@ -719,7 +719,7 @@ const I18N = {
     corsTitle: '请求被 CORS 阻止了吗？', corsBodyBefore: '如果 API 服务商不允许浏览器来源请求，请安装', corsBodyAfter: '并重新加载页面。它会通过后台 service worker 转发请求，避开浏览器同源策略。',
     configuration: '测试设置', provider: '服务商', openaiCompatible: 'OpenAI 兼容', anthropic: 'Anthropic', gemini: 'Gemini',
     profiles: '已存设置（别名）', profileNamePlaceholder: '别名，例如 OpenAI／DeepSeek／公司', profileSave: '保存', profileNew: '新建', profileDelete: '删除', profileClearAll: '全部清空',
-    profileHint: '可为不同平台自定义别名并各自保存 API 密钥；切换时不会覆盖其他组。全部清空会移除此浏览器内所有自定义设置。',
+    profileHint: '为每个平台取一个别名后点「保存」：新别名会新增一组，同名会更新该组。用下拉菜单切换；「全部清空」会移除此浏览器内所有自定义设置。',
     profileNone: '尚无已存设置', profileSaved: '已保存“{name}”。', profileDeleted: '已删除“{name}”。', profileCleared: '已清空所有自定义设置。', profileNeedName: '请先输入别名再保存。', profileConfirmDelete: '确定删除“{name}”？', profileConfirmClear: '确定清空此浏览器内全部自定义设置？',
     apiKey: 'API 密钥', apiKeyPlaceholder: 'sk-... 或服务商提供的 API 密钥', endpoint: '端点 URL', endpointPlaceholder: 'Base URL 或完整端点，例如 https://api.openai.com/v1',
     endpointHint: '离开字段时会补成服务商端点（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已粘贴的完整 URL 会保持不变。',
@@ -957,12 +957,12 @@ function saveCurrentProfile() {
     setProfileStatus(t('profileNeedName'));
     return;
   }
-  let profile = null;
-  if (activeProfileId) profile = profiles.find(p => p.id === activeProfileId) || null;
-  if (!profile) profile = profiles.find(p => String(p.name).toLowerCase() === name.toLowerCase()) || null;
-  const next = snapshotFormToProfile(profile);
+  // Upsert by alias name so a new alias always creates another profile
+  // instead of overwriting the currently selected one.
+  const existing = profiles.find(p => String(p.name).toLowerCase() === name.toLowerCase()) || null;
+  const next = snapshotFormToProfile(existing);
   next.name = name;
-  if (profile) {
+  if (existing) {
     profiles = profiles.map(p => p.id === next.id ? next : p);
   } else {
     profiles.push(next);
