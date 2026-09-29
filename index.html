@@ -265,7 +265,9 @@
   .model-card-action:hover { filter: brightness(0.97); }
   .model-detail-loading, .model-detail-error { margin: 0 0 0.8rem; color: var(--text-dim); font-size: 0.78rem; line-height: 1.5; }
   @media (max-width: 640px) { .model-catalog-header { flex-direction: column; } .model-catalog-count { align-self: flex-start; } }
-  .model-picker { position: relative; flex: 0 0 min(18rem, 34%); min-width: 12rem; }
+  .model-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: stretch; }
+  .model-row > #model { flex: 1 1 12rem; min-width: 0; }
+  .model-picker { position: relative; flex: 0 0 min(18rem, 34%); min-width: 12rem; max-width: 100%; }
   .model-picker summary {
     display: flex;
     align-items: center;
@@ -279,7 +281,9 @@
     border: 3px solid var(--border-color);
     border-radius: 6px;
     font-weight: 700;
+    overflow: hidden;
   }
+  .model-picker summary > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .model-picker summary::-webkit-details-marker { display: none; }
   .model-picker summary::after { content: ''; width: 0.55rem; height: 0.55rem; flex: 0 0 auto; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; color: var(--text-dim); transform: rotate(45deg) translateY(-2px); }
   .model-picker[open] summary { border-radius: 6px 6px 0 0; }
@@ -315,7 +319,14 @@
   html.dark .model-option { border-bottom-color: #3f4b47; color: #e5ebe7; }
   html.dark .model-option:hover { background-color: #293733; color: #f2f3ee; }
   html.dark .model-option[aria-selected="true"] { background-color: #3b4b3b; color: #e7f1bf; }
-  @media (max-width: 640px) { .model-picker { flex-basis: 100%; min-width: 0; } }
+  @media (max-width: 640px) {
+    .model-row { flex-direction: column; }
+    .model-row > #model, .model-picker { flex: 1 1 auto; width: 100%; min-width: 0; }
+    .model-picker-options { position: static; max-height: 14rem; box-shadow: none; border-top: 0; }
+    .model-picker[open] summary { border-bottom-width: 0; }
+    .model-catalog-grid { grid-template-columns: 1fr; }
+    .model-card-details .model-details-grid { grid-template-columns: 1fr; }
+  }
 
   .neo-border { border: 2px solid var(--border-color); border-radius: 8px; transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease; }
   .neo-shadow { box-shadow: 0 6px 0 var(--shadow-color); }
@@ -407,10 +418,41 @@
   .data-table td, .stat-box .v { font-variant-numeric: tabular-nums; }
   html.dark .text-red-500, html.dark .text-red-400 { color: var(--accent-red) !important; }
   @media (max-width: 640px) {
-    .app-header { align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; }
-    .app-header > div:last-child { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+    .app-header { align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; min-height: 0; }
+    .app-header > div:last-child { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem; }
+    .app-header .header-btn-label { display: none; }
     .language-select { min-width: 7.5rem; }
+    .language-picker { min-width: 6.5rem; flex: 1 1 auto; }
+    .app-main { padding-top: 1.5rem !important; padding-bottom: 3rem !important; }
+    .hero-block h2 { font-size: 2rem !important; line-height: 1.15 !important; }
+    .hero-block p { font-size: 0.95rem !important; }
+    .sparkle, .decor-svg { display: none !important; }
+    .neo-panel { padding: 1rem !important; border-radius: 12px; }
+    .provider-toggle { flex-wrap: wrap; width: 100%; }
+    .provider-btn { flex: 1 1 calc(50% - 1px); padding: 0.7rem 0.4rem; font-size: 0.72rem; }
+    .provider-btn + .provider-btn { border-left: none; }
+    .provider-btn:nth-child(odd) { border-right: 2px solid var(--border-color); }
+    .provider-btn:nth-child(n+3) { border-top: 2px solid var(--border-color); }
+    .model-catalog-grid { grid-template-columns: 1fr; }
+    .model-catalog-body { padding: 0 0.75rem 0.75rem; }
+    .profiles-row { flex-direction: column; align-items: stretch; }
+    .profiles-actions { width: 100%; }
+    .profiles-actions .neo-button,
+    .profiles-actions .neo-border { flex: 1; text-align: center; }
+    .data-table { min-width: 40rem; }
+    .stat-grid-mobile { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   }
+  .profiles-box {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.9rem;
+    background: var(--bg-header);
+  }
+  .profiles-row { display: flex; gap: 0.5rem; align-items: stretch; flex-wrap: wrap; }
+  .profiles-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .profiles-actions .neo-border { padding: 0.55rem 0.75rem; font-size: 0.75rem; font-weight: 800; white-space: nowrap; cursor: pointer; }
+  .profiles-hint { margin-top: 0.45rem; font-size: 0.72rem; color: var(--text-dim); line-height: 1.4; }
+  .profile-select { flex: 1 1 12rem; min-width: 0; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
   }
@@ -425,12 +467,12 @@
   <div class="flex items-center gap-2">
   <a id="githubLink" href="https://github.com/911218sky/llm-concurrency-test" target="_blank" rel="noopener" class="neo-border flex items-center gap-2 px-3 py-1.5 text-sm font-semibold" style="background-color: var(--bg-header); text-decoration: none;">
     <svg fill="currentColor" height="14" viewBox="0 0 24 24" width="14" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.92.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.94 10.94 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.41-5.27 5.69.41.35.78 1.05.78 2.12 0 1.53-.01 2.77-.01 3.14 0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"></path></svg>
-    <span data-i18n="github">GitHub</span>
+    <span class="header-btn-label" data-i18n="github">GitHub</span>
   </a>
   <button id="themeToggle" class="neo-border flex items-center gap-2 px-3 py-1.5 text-sm font-semibold" style="background-color: var(--bg-header);" onclick="toggleTheme()" type="button" aria-pressed="false">
     <svg id="iconMoon" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
     <svg id="iconSun" class="hidden" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
-    <span id="themeLabel" data-i18n="themeDark">Dark mode</span>
+    <span id="themeLabel" class="header-btn-label" data-i18n="themeDark">Dark mode</span>
   </button>
   <span class="sr-only" id="languageLabel" data-i18n="language">Language</span>
   <details id="languagePicker" class="language-picker neo-border" aria-labelledby="languageLabel">
@@ -448,10 +490,10 @@
 
   <svg class="sparkle top-40 right-40 text-green-400" fill="currentColor" stroke="black" stroke-width="2" style="width: 30px; height: 30px; transform: rotate(15deg);" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6H22l-6.2 4.5 2.4 7.6-6.2-4.5-6.2 4.5 2.4-7.6L2 9.6h7.6z"></path></svg>
 
-  <div class="text-center max-w-2xl mb-8 relative z-10">
+  <div class="hero-block text-center max-w-2xl mb-6 md:mb-8 relative z-10">
     <div class="text-xs font-bold uppercase tracking-widest mb-2" style="color: var(--text-dim);" data-i18n="eyebrow">LLM API • LOAD TEST • CLIENT-SIDE</div>
-    <h2 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4 tracking-tight"><span data-i18n="heroTitleLine1">LLM Concurrency</span><br/><span data-i18n="heroTitleLine2">Test</span></h2>
-    <p class="text-lg font-medium px-4" style="color: var(--text-dim);">
+    <h2 class="text-5xl md:text-6xl font-extrabold leading-tight mb-3 md:mb-4 tracking-tight"><span data-i18n="heroTitleLine1">LLM Concurrency</span><br/><span data-i18n="heroTitleLine2">Test</span></h2>
+    <p class="text-lg font-medium px-2 md:px-4" style="color: var(--text-dim);">
       <span data-i18n="heroDescription">Fires N simultaneous requests and measures whether they run in parallel. Local mode automatically relays API calls through this machine to avoid browser CORS failures.</span>
     </p>
   </div>
@@ -479,6 +521,22 @@
     <h3 class="text-sm font-bold uppercase tracking-wider mb-6 pb-2" style="color: var(--text-dim); border-bottom: 2px solid var(--text-dim);" data-i18n="configuration">Test Configuration</h3>
     <div class="space-y-6">
 
+      <div class="profiles-box">
+        <label class="label-text" for="profileSelect" data-i18n="profiles">SAVED PROFILES</label>
+        <div class="profiles-row">
+          <select id="profileSelect" class="neo-input profile-select" aria-label="Saved profiles"></select>
+          <input id="profileName" class="neo-input profile-select" type="text" value="" data-i18n-placeholder="profileNamePlaceholder" placeholder="Alias, e.g. OpenAI / DeepSeek / Work" autocomplete="off"/>
+        </div>
+        <div class="profiles-actions" style="margin-top: 0.5rem;">
+          <button type="button" class="neo-border" style="background-color: var(--accent-yellow);" onclick="saveCurrentProfile()" data-i18n="profileSave">Save</button>
+          <button type="button" class="neo-border" style="background-color: var(--bg-header);" onclick="newProfile()" data-i18n="profileNew">New</button>
+          <button type="button" class="neo-border" style="background-color: var(--bg-header); color: var(--text-danger);" onclick="deleteCurrentProfile()" data-i18n="profileDelete">Delete</button>
+          <button type="button" class="neo-border" style="background-color: var(--bg-header); color: var(--text-danger);" onclick="clearAllProfiles()" data-i18n="profileClearAll">Clear all</button>
+        </div>
+        <div class="profiles-hint" data-i18n="profileHint">Save each platform under a custom alias with its own API key. Switching profiles keeps the others. Clear all removes every saved custom profile from this browser.</div>
+        <div id="profileStatus" class="profiles-hint" style="margin-top: 0.25rem;" aria-live="polite"></div>
+      </div>
+
       <div>
         <label class="label-text" data-i18n="provider">PROVIDER</label>
         <div class="provider-toggle">
@@ -503,8 +561,8 @@
             <label class="label-text" for="model" style="margin-bottom: 0;" data-i18n="model">MODEL</label>
             <button type="button" id="fetchModelsBtn" class="text-xs font-bold px-2 py-1 neo-border" style="background-color: var(--bg-header);" onclick="fetchModels()" data-i18n="fetchModels">Fetch models</button>
           </div>
-          <div class="flex gap-2">
-            <input id="model" class="neo-input flex-1" type="text" value="" data-i18n-placeholder="modelPlaceholder" placeholder="e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash"/>
+          <div class="model-row">
+            <input id="model" class="neo-input" type="text" value="" data-i18n-placeholder="modelPlaceholder" placeholder="e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash"/>
             <details id="modelPicker" class="model-picker hidden">
               <summary><span id="modelPickerLabel" data-i18n="pickModel">Pick a model…</span><span id="modelPickerCount"></span></summary>
               <div id="modelPickerOptions" class="model-picker-options" role="listbox" aria-label="Models"></div>
@@ -588,7 +646,7 @@
 
   <div id="output" class="w-full max-w-4xl mt-8 relative z-10 space-y-6"></div>
 
-  <svg class="absolute bottom-10 left-10 z-0" style="width: 80px; height: 80px; color: var(--accent-green-btn); opacity: 0.5;" fill="currentColor" stroke="black" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm0 4c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"></path></svg>
+  <svg class="decor-svg absolute bottom-10 left-10 z-0" style="width: 80px; height: 80px; color: var(--accent-green-btn); opacity: 0.5;" fill="currentColor" stroke="black" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm0 4c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"></path></svg>
 </main>
 
 <script>
@@ -604,6 +662,9 @@ const I18N = {
     securityNotice: 'Your API key stays in this browser. On the local deployment, requests go through the local relay automatically, so providers do not need browser CORS support. Fill in the API key and endpoint, then leave the field to load available models automatically.',
     corsTitle: 'Requests blocked by CORS?', corsBodyBefore: "If your API provider does not allow browser-origin requests, install the", corsBodyAfter: 'and reload this page. It relays your requests through a background service worker so the browser same-origin policy no longer applies.',
     configuration: 'Test configuration', provider: 'Provider', openaiCompatible: 'OpenAI-compatible', anthropic: 'Anthropic', gemini: 'Gemini',
+    profiles: 'Saved profiles', profileNamePlaceholder: 'Alias, e.g. OpenAI / DeepSeek / Work', profileSave: 'Save', profileNew: 'New', profileDelete: 'Delete', profileClearAll: 'Clear all',
+    profileHint: 'Save each platform under a custom alias with its own API key. Switching profiles keeps the others. Clear all removes every saved custom profile from this browser.',
+    profileNone: 'No saved profiles yet', profileSaved: 'Saved “{name}”.', profileDeleted: 'Deleted “{name}”.', profileCleared: 'All custom profiles cleared.', profileNeedName: 'Enter an alias name before saving.', profileConfirmDelete: 'Delete profile “{name}”?', profileConfirmClear: 'Clear ALL saved custom profiles from this browser?',
     apiKey: 'API key', apiKeyPlaceholder: "sk-... or your provider's API key", endpoint: 'Endpoint URL', endpointPlaceholder: 'Base URL or full endpoint, e.g. https://api.openai.com/v1',
     endpointHint: 'Base URL is resolved when you leave the field (OpenAI → /chat/completions, Anthropic → /v1/messages, Gemini → /v1beta). A full URL you pasted is left untouched.',
     model: 'Model', fetchModels: 'Fetch models', fetching: 'Fetching…', modelPlaceholder: 'e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: 'Pick a model…', modelDetailsTitle: 'Model details', modelCatalog: 'Model catalog', modelCatalogHint: 'Browse limits and capabilities before choosing a model.', modelCount: '{count} models', viewDetails: 'Show details', useModel: 'Use this model', capabilitiesNotProvided: 'Capabilities not provided', modelBasics: 'Model information', modelDescription: 'Description', baseModel: 'Base model', version: 'Version',
@@ -629,6 +690,9 @@ const I18N = {
     securityNotice: 'API 金鑰只會留在這個瀏覽器。本機部署會自動透過本機 relay 發送請求，因此服務商不需要支援瀏覽器 CORS。填入 API 金鑰與端點，離開欄位後會自動載入可用模型。',
     corsTitle: '請求被 CORS 阻擋了嗎？', corsBodyBefore: '如果 API 服務商不允許瀏覽器來源請求，請安裝', corsBodyAfter: '並重新載入頁面。它會透過背景 service worker 轉送請求，避開瀏覽器同源政策。',
     configuration: '測試設定', provider: '服務商', openaiCompatible: 'OpenAI 相容', anthropic: 'Anthropic', gemini: 'Gemini',
+    profiles: '已存設定（別名）', profileNamePlaceholder: '別名，例如 OpenAI／DeepSeek／公司', profileSave: '儲存', profileNew: '新增', profileDelete: '刪除', profileClearAll: '全部清空',
+    profileHint: '可為不同平台自訂別名並各自保存 API 金鑰；切換時不會覆蓋其他組。全部清空會移除此瀏覽器內所有自訂設定。',
+    profileNone: '尚無已存設定', profileSaved: '已儲存「{name}」。', profileDeleted: '已刪除「{name}」。', profileCleared: '已清空所有自訂設定。', profileNeedName: '請先輸入別名再儲存。', profileConfirmDelete: '確定刪除「{name}」？', profileConfirmClear: '確定清空此瀏覽器內全部自訂設定？',
     apiKey: 'API 金鑰', apiKeyPlaceholder: 'sk-... 或服務商提供的 API 金鑰', endpoint: '端點 URL', endpointPlaceholder: 'Base URL 或完整端點，例如 https://api.openai.com/v1',
     endpointHint: '離開欄位時會補成服務商端點（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已貼上的完整 URL 會保持不變。',
     model: '模型', fetchModels: '取得模型', fetching: '取得中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '選擇模型…', modelDetailsTitle: '模型詳細資訊', modelCatalog: '模型總覽', modelCatalogHint: '先比較限制與支援能力，再選擇要測試的模型。', modelCount: '共 {count} 個模型', viewDetails: '顯示詳細資料', useModel: '使用此模型', capabilitiesNotProvided: '服務商未提供能力資料', modelBasics: '模型資訊', modelDescription: '模型描述', baseModel: '基礎模型', version: '版本',
@@ -654,6 +718,9 @@ const I18N = {
     securityNotice: 'API 密钥只会保留在这个浏览器。本机部署会自动通过本机 relay 发送请求，因此服务商不需要支持浏览器 CORS。填入 API 密钥和端点，离开字段后会自动加载可用模型。',
     corsTitle: '请求被 CORS 阻止了吗？', corsBodyBefore: '如果 API 服务商不允许浏览器来源请求，请安装', corsBodyAfter: '并重新加载页面。它会通过后台 service worker 转发请求，避开浏览器同源策略。',
     configuration: '测试设置', provider: '服务商', openaiCompatible: 'OpenAI 兼容', anthropic: 'Anthropic', gemini: 'Gemini',
+    profiles: '已存设置（别名）', profileNamePlaceholder: '别名，例如 OpenAI／DeepSeek／公司', profileSave: '保存', profileNew: '新建', profileDelete: '删除', profileClearAll: '全部清空',
+    profileHint: '可为不同平台自定义别名并各自保存 API 密钥；切换时不会覆盖其他组。全部清空会移除此浏览器内所有自定义设置。',
+    profileNone: '尚无已存设置', profileSaved: '已保存“{name}”。', profileDeleted: '已删除“{name}”。', profileCleared: '已清空所有自定义设置。', profileNeedName: '请先输入别名再保存。', profileConfirmDelete: '确定删除“{name}”？', profileConfirmClear: '确定清空此浏览器内全部自定义设置？',
     apiKey: 'API 密钥', apiKeyPlaceholder: 'sk-... 或服务商提供的 API 密钥', endpoint: '端点 URL', endpointPlaceholder: 'Base URL 或完整端点，例如 https://api.openai.com/v1',
     endpointHint: '离开字段时会补成服务商端点（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已粘贴的完整 URL 会保持不变。',
     model: '模型', fetchModels: '获取模型', fetching: '获取中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '选择模型…', modelDetailsTitle: '模型详细信息', modelCatalog: '模型总览', modelCatalogHint: '先比较限制和支持能力，再选择要测试的模型。', modelCount: '共 {count} 个模型', viewDetails: '显示详细信息', useModel: '使用此模型', capabilitiesNotProvided: '服务商未提供能力资料', modelBasics: '模型信息', modelDescription: '模型描述', baseModel: '基础模型', version: '版本',
@@ -716,6 +783,7 @@ function applyLanguage(language) {
   document.querySelectorAll('.language-option').forEach((option) => option.setAttribute('aria-selected', String(option.dataset.language === currentLanguage)));
   applyThemeUi();
   if (typeof modelCatalog !== 'undefined' && modelCatalog.size) renderModelCatalog();
+  if (typeof renderProfileSelect === 'function') renderProfileSelect();
   if (typeof latestRun !== 'undefined' && latestRun) finalizeRender(latestRun);
 }
 
@@ -737,6 +805,237 @@ function saveField(key, value) {
 function loadField(key) {
   try { return localStorage.getItem('llmct_' + key); } catch (e) { return null; }
 }
+
+/* ---------- Multi-profile (alias + key) ---------- */
+let profiles = [];
+let activeProfileId = null;
+let profileUiReady = false;
+
+function newProfileId() {
+  return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function readProfilesStore() {
+  try {
+    const raw = localStorage.getItem('llmct_profiles');
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list.filter(p => p && typeof p === 'object') : [];
+  } catch (e) { return []; }
+}
+
+function writeProfilesStore() {
+  try { localStorage.setItem('llmct_profiles', JSON.stringify(profiles)); } catch (e) {}
+  try {
+    if (activeProfileId) localStorage.setItem('llmct_activeProfileId', activeProfileId);
+    else localStorage.removeItem('llmct_activeProfileId');
+  } catch (e) {}
+}
+
+function setProfileStatus(msg) {
+  const el = document.getElementById('profileStatus');
+  if (el) el.textContent = msg || '';
+}
+
+function snapshotFormToProfile(base) {
+  const name = (document.getElementById('profileName').value || '').trim() || (base && base.name) || t('profileNone');
+  return {
+    id: (base && base.id) || newProfileId(),
+    name,
+    provider: currentProvider || 'openai',
+    apiKey: document.getElementById('apiKey').value,
+    endpoint: document.getElementById('endpoint').value.trim(),
+    model: document.getElementById('model').value.trim(),
+    updatedAt: Date.now()
+  };
+}
+
+function applyProfileToForm(profile, opts) {
+  const options = opts || {};
+  if (!profile) return;
+  activeProfileId = profile.id;
+  document.getElementById('profileName').value = profile.name || '';
+  document.getElementById('apiKey').value = profile.apiKey || '';
+  document.getElementById('model').value = profile.model || '';
+  setProvider(['openai', 'anthropic', 'gemini'].includes(profile.provider) ? profile.provider : 'openai');
+  const endpoint = profile.endpoint || '';
+  document.getElementById('endpoint').value = endpoint ? normalizeEndpoint(currentProvider, endpoint) : '';
+  saveField('apiKey', document.getElementById('apiKey').value);
+  saveField('model', document.getElementById('model').value);
+  saveField('endpoint', document.getElementById('endpoint').value);
+  saveField('provider', currentProvider);
+  writeProfilesStore();
+  renderProfileSelect();
+  validateRunButton();
+  if (options.autoFetch && document.getElementById('apiKey').value.trim() && document.getElementById('endpoint').value.trim()) {
+    window.setTimeout(() => fetchModels(), 0);
+  }
+}
+
+function renderProfileSelect() {
+  const select = document.getElementById('profileSelect');
+  if (!select) return;
+  const previous = activeProfileId;
+  select.innerHTML = '';
+  if (!profiles.length) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = t('profileNone');
+    select.appendChild(opt);
+    select.value = '';
+    return;
+  }
+  profiles
+    .slice()
+    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }))
+    .forEach((profile) => {
+      const opt = document.createElement('option');
+      opt.value = profile.id;
+      opt.textContent = profile.name || profile.id;
+      select.appendChild(opt);
+    });
+  if (previous && profiles.some(p => p.id === previous)) select.value = previous;
+  else {
+    select.value = profiles[0].id;
+    activeProfileId = profiles[0].id;
+  }
+}
+
+function migrateLegacyProfile() {
+  if (profiles.length) return;
+  const apiKey = loadField('apiKey') || '';
+  const endpoint = loadField('endpoint') || '';
+  const model = loadField('model') || '';
+  const provider = loadField('provider') || 'openai';
+  if (!(apiKey || endpoint || model)) return;
+  const profile = {
+    id: newProfileId(),
+    name: 'Default',
+    provider: ['openai', 'anthropic', 'gemini'].includes(provider) ? provider : 'openai',
+    apiKey, endpoint, model,
+    updatedAt: Date.now()
+  };
+  profiles = [profile];
+  activeProfileId = profile.id;
+  writeProfilesStore();
+}
+
+function initProfiles() {
+  profiles = readProfilesStore().map((p) => ({
+    id: p.id || newProfileId(),
+    name: String(p.name || '').trim() || 'Untitled',
+    provider: ['openai', 'anthropic', 'gemini'].includes(p.provider) ? p.provider : 'openai',
+    apiKey: p.apiKey || '',
+    endpoint: p.endpoint || '',
+    model: p.model || '',
+    updatedAt: p.updatedAt || Date.now()
+  }));
+  try { activeProfileId = localStorage.getItem('llmct_activeProfileId'); } catch (e) { activeProfileId = null; }
+  migrateLegacyProfile();
+  renderProfileSelect();
+  const selected = profiles.find(p => p.id === activeProfileId) || profiles[0];
+  if (selected) applyProfileToForm(selected, { autoFetch: false });
+  else {
+    document.getElementById('profileName').value = '';
+    setProfileStatus('');
+  }
+  const select = document.getElementById('profileSelect');
+  if (select && !profileUiReady) {
+    select.addEventListener('change', () => {
+      const profile = profiles.find(p => p.id === select.value);
+      if (profile) {
+        applyProfileToForm(profile, { autoFetch: true });
+        setProfileStatus('');
+      }
+    });
+    profileUiReady = true;
+  }
+}
+
+function saveCurrentProfile() {
+  const name = (document.getElementById('profileName').value || '').trim();
+  if (!name) {
+    setProfileStatus(t('profileNeedName'));
+    return;
+  }
+  let profile = null;
+  if (activeProfileId) profile = profiles.find(p => p.id === activeProfileId) || null;
+  if (!profile) profile = profiles.find(p => String(p.name).toLowerCase() === name.toLowerCase()) || null;
+  const next = snapshotFormToProfile(profile);
+  next.name = name;
+  if (profile) {
+    profiles = profiles.map(p => p.id === next.id ? next : p);
+  } else {
+    profiles.push(next);
+  }
+  activeProfileId = next.id;
+  writeProfilesStore();
+  saveField('apiKey', next.apiKey);
+  saveField('endpoint', next.endpoint);
+  saveField('model', next.model);
+  saveField('provider', next.provider);
+  renderProfileSelect();
+  setProfileStatus(t('profileSaved', { name: next.name }));
+  validateRunButton();
+}
+
+function newProfile() {
+  activeProfileId = null;
+  writeProfilesStore();
+  document.getElementById('profileSelect').value = '';
+  document.getElementById('profileName').value = '';
+  document.getElementById('apiKey').value = '';
+  document.getElementById('endpoint').value = '';
+  document.getElementById('model').value = '';
+  setProvider('openai');
+  saveField('apiKey', '');
+  saveField('endpoint', '');
+  saveField('model', '');
+  const picker = document.getElementById('modelPicker');
+  const catalog = document.getElementById('modelCatalogView');
+  if (picker) picker.classList.add('hidden');
+  if (catalog) catalog.classList.add('hidden');
+  const status = document.getElementById('modelsStatus');
+  if (status) status.textContent = '';
+  modelCatalog = new Map();
+  setProfileStatus('');
+  validateRunButton();
+}
+
+function deleteCurrentProfile() {
+  const select = document.getElementById('profileSelect');
+  const id = select && select.value;
+  const profile = profiles.find(p => p.id === id);
+  if (!profile) {
+    setProfileStatus(t('profileNone'));
+    return;
+  }
+  if (!window.confirm(t('profileConfirmDelete', { name: profile.name }))) return;
+  profiles = profiles.filter(p => p.id !== profile.id);
+  activeProfileId = profiles[0] ? profiles[0].id : null;
+  writeProfilesStore();
+  renderProfileSelect();
+  if (profiles[0]) applyProfileToForm(profiles[0], { autoFetch: false });
+  else newProfile();
+  setProfileStatus(t('profileDeleted', { name: profile.name }));
+}
+
+function clearAllProfiles() {
+  if (!window.confirm(t('profileConfirmClear'))) return;
+  profiles = [];
+  activeProfileId = null;
+  try {
+    localStorage.removeItem('llmct_profiles');
+    localStorage.removeItem('llmct_activeProfileId');
+    localStorage.removeItem('llmct_apiKey');
+    localStorage.removeItem('llmct_endpoint');
+    localStorage.removeItem('llmct_model');
+    localStorage.removeItem('llmct_provider');
+  } catch (e) {}
+  renderProfileSelect();
+  newProfile();
+  setProfileStatus(t('profileCleared'));
+}
+
 
 /* ---------- Transport shim (local relay + extension relay + fetch fallback) ----------
  * When the Chrome extension's content script has set window.__llmctExtensionBridge,
@@ -1244,10 +1543,13 @@ function validateRunButton() {
     const savedModel = loadField('model');
     const savedProvider = loadField('provider');
 
-    if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
-    if (savedModel) document.getElementById('model').value = savedModel;
-    setProvider(['openai', 'anthropic', 'gemini'].includes(savedProvider) ? savedProvider : 'openai');
-    if (savedEndpoint) document.getElementById('endpoint').value = normalizeEndpoint(currentProvider, savedEndpoint);
+    initProfiles();
+    if (!profiles.length) {
+      if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
+      if (savedModel) document.getElementById('model').value = savedModel;
+      setProvider(['openai', 'anthropic', 'gemini'].includes(savedProvider) ? savedProvider : 'openai');
+      if (savedEndpoint) document.getElementById('endpoint').value = normalizeEndpoint(currentProvider, savedEndpoint);
+    }
 
     document.querySelectorAll('.language-option').forEach((option) => option.addEventListener('click', () => {
       applyLanguage(option.dataset.language);
