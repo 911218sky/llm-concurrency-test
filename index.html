@@ -437,22 +437,47 @@
     .model-catalog-body { padding: 0 0.75rem 0.75rem; }
     .profiles-row { flex-direction: column; align-items: stretch; }
     .profiles-actions { width: 100%; }
-    .profiles-actions .neo-button,
-    .profiles-actions .neo-border { flex: 1; text-align: center; }
     .data-table { min-width: 40rem; }
     .stat-grid-mobile { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   }
   .profiles-box {
     border: 2px solid var(--border-color);
     border-radius: 10px;
-    padding: 0.9rem;
+    padding: 0.7rem;
     background: var(--bg-header);
   }
-  .profiles-row { display: flex; gap: 0.5rem; align-items: stretch; flex-wrap: wrap; }
-  .profiles-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .profiles-actions .neo-border { padding: 0.55rem 0.75rem; font-size: 0.75rem; font-weight: 800; white-space: nowrap; cursor: pointer; }
-  .profiles-hint { margin-top: 0.45rem; font-size: 0.72rem; color: var(--text-dim); line-height: 1.4; }
-  .profile-select { flex: 1 1 12rem; min-width: 0; }
+  .profiles-row { display: flex; gap: 0.45rem; align-items: stretch; flex-wrap: wrap; }
+  .profiles-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .profiles-actions .neo-border {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    background-color: var(--bg-input) !important;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .profiles-actions .profile-save-btn {
+    background-color: color-mix(in srgb, var(--accent-yellow) 28%, var(--bg-input)) !important;
+    color: var(--text) !important;
+  }
+  .profiles-actions .profile-danger-btn { color: var(--text-danger) !important; }
+  .profiles-hint { margin-top: 0.4rem; font-size: 0.7rem; color: var(--text-dim); line-height: 1.35; }
+  .profile-select {
+    flex: 1 1 12rem;
+    min-width: 0;
+    min-height: 0 !important;
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+  }
+  @media (max-width: 640px) {
+    .profiles-box { padding: 0.6rem; }
+    .profile-select { padding: 0.4rem 0.55rem !important; font-size: 0.8rem !important; }
+    .profiles-actions .neo-border { flex: 1 1 calc(50% - 0.4rem); text-align: center; padding: 0.45rem 0.4rem; }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
   }
@@ -527,11 +552,11 @@
           <select id="profileSelect" class="neo-input profile-select" aria-label="Saved profiles"></select>
           <input id="profileName" class="neo-input profile-select" type="text" value="" data-i18n-placeholder="profileNamePlaceholder" placeholder="Alias, e.g. OpenAI / DeepSeek / Work" autocomplete="off"/>
         </div>
-        <div class="profiles-actions" style="margin-top: 0.5rem;">
-          <button type="button" class="neo-border" style="background-color: var(--accent-yellow);" onclick="saveCurrentProfile()" data-i18n="profileSave">Save</button>
-          <button type="button" class="neo-border" style="background-color: var(--bg-header);" onclick="newProfile()" data-i18n="profileNew">New</button>
-          <button type="button" class="neo-border" style="background-color: var(--bg-header); color: var(--text-danger);" onclick="deleteCurrentProfile()" data-i18n="profileDelete">Delete</button>
-          <button type="button" class="neo-border" style="background-color: var(--bg-header); color: var(--text-danger);" onclick="clearAllProfiles()" data-i18n="profileClearAll">Clear all</button>
+        <div class="profiles-actions" style="margin-top: 0.45rem;">
+          <button type="button" class="neo-border profile-save-btn" onclick="saveCurrentProfile()" data-i18n="profileSave">Save</button>
+          <button type="button" class="neo-border" onclick="newProfile()" data-i18n="profileNew">New</button>
+          <button type="button" class="neo-border profile-danger-btn" onclick="deleteCurrentProfile()" data-i18n="profileDelete">Delete</button>
+          <button type="button" class="neo-border profile-danger-btn" onclick="clearAllProfiles()" data-i18n="profileClearAll">Clear all</button>
         </div>
         <div class="profiles-hint" data-i18n="profileHint">Give each platform its own alias and Save — a new alias adds another profile; the same alias updates it. Use the dropdown to switch. Clear all removes every saved custom profile from this browser.</div>
         <div id="profileStatus" class="profiles-hint" style="margin-top: 0.25rem;" aria-live="polite"></div>
