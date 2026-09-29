@@ -32,15 +32,24 @@ console.log('[LLMCT Relay] Content script loaded, hostname:', window.location.ho
   }
 
   const PAGE_ORIGIN = window.location.origin;
+  const portsById = new Map(); // id → { port, done }
 
   window.addEventListener('message', (e) => {
     // Reject messages from any source other than this page.
     if (e.source !== window) return;
     const d = e.data;
-    if (!d || d.type !== 'llmct:fetch') {
-      console.log('[LLMCT Relay] Received non-fetch message:', d?.type);
+    if (!d || typeof d !== 'object') return;
+
+    if (d.type === 'llmct:fetch:abort') {
+      const entry = portsById.get(d.id);
+      if (!entry) return;
+      entry.done = true;
+      try { entry.port.disconnect(); } catch (err) {}
+      portsById.delete(d.id);
       return;
     }
+
+    if (d.type !== 'llmct:fetch') return;
     console.log('[LLMCT Relay] Received fetch request for:', d?.url);
 
     const { id, url, method, headers, body } = d;
@@ -57,6 +66,9 @@ console.log('[LLMCT Relay] Content script loaded, hostname:', window.location.ho
       return;
     }
 
+    const entry = { port, done: false };
+    portsById.set(id, entry);
+
     port.onMessage.addListener((msg) => {
       if (msg.type === 'meta') {
         window.postMessage({
@@ -67,6 +79,7 @@ console.log('[LLMCT Relay] Content script loaded, hostname:', window.location.ho
           headers: msg.headers,
         }, PAGE_ORIGIN);
       } else if (msg.type === 'chunk') {
+        if (entry.done) return;
         // msg.data is an ArrayBuffer (transferred from the SW).
         const u8 = new Uint8Array(msg.data);
         window.postMessage({
@@ -75,15 +88,26 @@ console.log('[LLMCT Relay] Content script loaded, hostname:', window.location.ho
           chunk: u8,
         }, PAGE_ORIGIN, [u8.buffer]);
       } else if (msg.type === 'end') {
+        entry.done = true;
+        portsById.delete(id);
         window.postMessage({ type: 'llmct:fetch:end', id }, PAGE_ORIGIN);
-        try { port.disconnect(); } catch (e) {}
+        try { port.disconnect(); } catch (err) {}
       } else if (msg.type === 'error') {
+        entry.done = true;
+        portsById.delete(id);
         window.postMessage({ type: 'llmct:fetch:error', id, error: msg.error }, PAGE_ORIGIN);
-        try { port.disconnect(); } catch (e) {}
+        try { port.disconnect(); } catch (err) {}
       }
     });
 
     port.onDisconnect.addListener(() => {
+      const current = portsById.get(id);
+      if (!current || current.done) {
+        portsById.delete(id);
+        return;
+      }
+      current.done = true;
+      portsById.delete(id);
       const err = chrome.runtime.lastError;
       window.postMessage({
         type: 'llmct:fetch:error',

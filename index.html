@@ -84,7 +84,7 @@
 }
 </script>
 
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.tailwindcss.com?plugins=container-queries"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -151,9 +151,22 @@
   button, input, select, textarea { font: inherit; }
   button, a, input, select, textarea { color: var(--text); }
   a { color: inherit; }
-  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+  summary:focus-visible, .theme-menu-option:focus-visible, .model-option:focus-visible {
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
+  }
+  ::selection { background: var(--accent-muted); color: var(--text); }
+  html { accent-color: var(--accent-yellow); }
+  input.neo-input:-webkit-autofill,
+  input.neo-input:-webkit-autofill:hover,
+  input.neo-input:-webkit-autofill:focus,
+  textarea.neo-input:-webkit-autofill,
+  textarea.neo-input:-webkit-autofill:hover,
+  textarea.neo-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text);
+    box-shadow: 0 0 0 1000px var(--bg-input) inset;
+    transition: background-color 99999s ease-out;
   }
   .app-header { min-height: 4.5rem; }
   .app-main { width: 100%; }
@@ -213,6 +226,8 @@
   .language-picker > summary { background: var(--bg-header); }
   .language-picker-options { right: 0; left: auto; }
   .language-option { white-space: nowrap; }
+  .thinking-picker { width: 100%; }
+  .thinking-picker > summary { background: var(--bg-input); min-height: 2.85rem; padding: 0.65rem 0.75rem; }
   .model-details {
     position: fixed;
     inset: 0 0 0 auto;
@@ -271,32 +286,33 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    min-height: 3.25rem;
-    padding: 0.75rem 0.9rem;
+    min-height: 2.85rem;
+    padding: 0.65rem 0.75rem;
     cursor: pointer;
     list-style: none;
     background-color: var(--bg-input);
-    border: 3px solid var(--border-color);
-    border-radius: 6px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
     font-weight: 700;
     overflow: hidden;
   }
   .model-picker summary > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .model-picker summary::-webkit-details-marker { display: none; }
   .model-picker summary::after { content: ''; width: 0.55rem; height: 0.55rem; flex: 0 0 auto; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; color: var(--text-dim); transform: rotate(45deg) translateY(-2px); }
-  .model-picker[open] summary { border-radius: 6px 6px 0 0; }
+  .model-picker[open] summary { border-radius: 8px 8px 0 0; }
   .model-picker[open] summary::after { transform: rotate(225deg) translateY(-2px); }
   .model-picker-options {
     position: absolute;
     z-index: 20;
-    top: calc(100% - 3px);
+    top: calc(100% + 0.35rem);
     left: 0;
     right: 0;
     max-height: 18rem;
     overflow-y: auto;
-    border: 3px solid var(--border-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
     background-color: var(--bg-panel);
-    box-shadow: 5px 5px 0 var(--shadow-color);
+    box-shadow: 0 8px 18px var(--panel-shadow);
   }
   .model-option {
     display: block;
@@ -312,11 +328,6 @@
   }
   .model-option:last-child { border-bottom: 0; }
   .model-option:hover, .model-option[aria-selected="true"] { background-color: var(--accent-muted); color: var(--text); }
-  html.dark .model-picker summary { border-color: #68756f; background-color: #1b2224; }
-  html.dark .model-picker-options { border-color: #68756f; background-color: #1b2224; box-shadow: 5px 5px 0 #080b0c; }
-  html.dark .model-option { border-bottom-color: #3f4b47; color: #e5ebe7; }
-  html.dark .model-option:hover { background-color: #293733; color: #f2f3ee; }
-  html.dark .model-option[aria-selected="true"] { background-color: #3b4b3b; color: #e7f1bf; }
   @media (max-width: 640px) {
     .model-row { flex-direction: column; }
     .model-row > #model, .model-picker { flex: 1 1 auto; width: 100%; min-width: 0; }
@@ -365,6 +376,9 @@
   .neo-button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--shadow-color); }
   .neo-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 0 var(--shadow-color); }
   .neo-button-green { background-color: var(--accent-green-btn); }
+  .neo-button-danger { background-color: color-mix(in srgb, var(--fill-danger) 72%, var(--bg-panel)); color: var(--text-danger); }
+  .neo-button-secondary { background-color: var(--bg-header); border: 2px solid var(--border-color); border-radius: 8px; font-weight: 700; cursor: pointer; color: var(--text); }
+  .neo-button-secondary:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
   .neo-panel {
     background-color: var(--bg-panel);
     border: 2px solid var(--border-color);
@@ -394,8 +408,9 @@
   .provider-btn { padding: 0.65rem 1rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; background-color: transparent; color: var(--text); }
   .provider-btn + .provider-btn { border-left: 2px solid var(--border-color); }
   .provider-btn.active { background-color: var(--accent-muted); }
-  html.dark .provider-btn.active { background-color: #3b4b3b; color: #e7f1bf; }
-  .provider-btn:hover:not(.active), .neo-border:hover:not(button) { background-color: var(--bg-input) !important; }
+  .provider-btn:hover:not(.active) { background-color: var(--bg-input) !important; }
+  .neo-border.action-chip:hover:not(:disabled),
+  .neo-button-secondary:hover:not(:disabled) { background-color: var(--bg-input) !important; }
   .provider-btn:active { transform: translateY(1px); }
   .provider-btn:focus-visible { outline: 0; box-shadow: inset 0 0 0 3px var(--focus-ring); }
   .model-option { transition: background-color 0.12s ease, color 0.12s ease; }
@@ -526,7 +541,7 @@
   </div>
 </header>
 
-<main class="app-main flex-grow flex flex-col items-center justify-start pt-12 pb-24 px-4 relative overflow-hidden">
+<main class="app-main flex-grow flex flex-col items-center justify-start pt-12 pb-24 px-4 relative overflow-x-hidden">
 
   <svg class="sparkle top-40 right-40 text-green-400" fill="currentColor" stroke="black" stroke-width="2" style="width: 30px; height: 30px; transform: rotate(15deg);" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6H22l-6.2 4.5 2.4 7.6-6.2-4.5-6.2 4.5 2.4-7.6L2 9.6h7.6z"></path></svg>
 
@@ -602,11 +617,11 @@
         <div>
           <div class="flex items-center justify-between mb-1">
             <label class="label-text" for="model" style="margin-bottom: 0;" data-i18n="model">MODEL</label>
-            <button type="button" id="fetchModelsBtn" class="text-xs font-bold px-2 py-1 neo-border" style="background-color: var(--bg-header);" onclick="fetchModels()" data-i18n="fetchModels">Fetch models</button>
+            <button type="button" id="fetchModelsBtn" class="text-xs font-bold px-2 py-1 neo-button-secondary" onclick="fetchModels()" data-i18n="fetchModels">Fetch models</button>
           </div>
           <div class="model-row">
             <input id="model" class="neo-input" type="text" value="" data-i18n-placeholder="modelPlaceholder" placeholder="e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash"/>
-            <details id="modelPicker" class="model-picker hidden">
+            <details id="modelPicker" class="theme-menu model-picker hidden">
               <summary><span id="modelPickerLabel" data-i18n="pickModel">Pick a model…</span><span id="modelPickerCount"></span></summary>
               <div id="modelPickerOptions" class="model-picker-options" role="listbox" aria-label="Models"></div>
             </details>
@@ -640,13 +655,17 @@
           <input id="topP" class="neo-input w-full" step="0.1" type="number" value="1" min="0" max="1"/>
         </div>
         <div>
-          <label class="label-text" for="thinkingStrength" data-i18n="thinkingStrength">THINKING STRENGTH</label>
-          <select id="thinkingStrength" class="neo-input w-full">
-            <option value="off" data-i18n="thinkingOff">Off</option>
-            <option value="low" data-i18n="thinkingLow">Low</option>
-            <option value="medium" selected data-i18n="thinkingMedium">Medium</option>
-            <option value="high" data-i18n="thinkingHigh">High</option>
-          </select>
+          <label class="label-text" id="thinkingStrengthLabel" data-i18n="thinkingStrength">THINKING STRENGTH</label>
+          <input type="hidden" id="thinkingStrength" value="medium" />
+          <details id="thinkingStrengthPicker" class="theme-menu thinking-picker neo-border" aria-labelledby="thinkingStrengthLabel">
+            <summary><span id="thinkingStrengthPickerLabel" data-i18n="thinkingMedium">Medium</span></summary>
+            <div id="thinkingStrengthOptions" class="theme-menu-options" role="listbox" aria-label="Thinking strength">
+              <button type="button" class="theme-menu-option thinking-option" data-value="off" data-i18n="thinkingOff" role="option" aria-selected="false">Off</button>
+              <button type="button" class="theme-menu-option thinking-option" data-value="low" data-i18n="thinkingLow" role="option" aria-selected="false">Low</button>
+              <button type="button" class="theme-menu-option thinking-option" data-value="medium" data-i18n="thinkingMedium" role="option" aria-selected="true">Medium</button>
+              <button type="button" class="theme-menu-option thinking-option" data-value="high" data-i18n="thinkingHigh" role="option" aria-selected="false">High</button>
+            </div>
+          </details>
           <div class="text-xs mt-1" style="color: var(--text-dim);" data-i18n="thinkingHint">Mapped to each provider's native reasoning or thinking setting.</div>
         </div>
       </div>
@@ -668,13 +687,13 @@
             <span id="runLabel" data-i18n="runTest">RUN TEST</span>
             <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </button>
-          <button id="stopBtn" class="neo-border text-lg px-6 py-3 flex-1 md:flex-none text-center font-bold hidden" type="button" onclick="stopTest()" disabled style="background-color: var(--bg-input); color: var(--text-danger);">
+          <button id="stopBtn" class="neo-button neo-button-danger text-lg px-6 py-3 flex-1 md:flex-none text-center hidden" type="button" onclick="stopTest()" disabled>
             <span id="stopLabel" data-i18n="stopTest">STOP</span>
           </button>
         </div>
         <div class="flex gap-2 w-full md:w-auto">
-          <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('light')" data-i18n="lightLoad">Light load</button>
-          <button class="neo-border px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" style="background-color: var(--bg-header);" type="button" onclick="applyPreset('heavy')" data-i18n="heavyLoad">Heavy load</button>
+          <button class="neo-button-secondary px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" type="button" onclick="applyPreset('light')" data-i18n="lightLoad">Light load</button>
+          <button class="neo-button-secondary px-4 py-2 text-sm font-bold transition-colors w-1/2 md:w-auto" type="button" onclick="applyPreset('heavy')" data-i18n="heavyLoad">Heavy load</button>
         </div>
       </div>
       <div id="validationMsg" class="validation-msg hidden" data-i18n="validation">Fill in API key, endpoint, and model before running a test.</div>
@@ -702,7 +721,7 @@ const I18N = {
     configuration: 'Test configuration', provider: 'Provider', openaiCompatible: 'OpenAI-compatible', anthropic: 'Anthropic', gemini: 'Gemini',
     profiles: 'Saved profiles', profileNamePlaceholder: 'Alias, e.g. OpenAI / DeepSeek / Work', profileSave: 'Save', profileNew: 'New', profileDelete: 'Delete', profileClearAll: 'Clear all',
     profileHint: 'Give each platform its own alias and Save — a new alias adds another profile; the same alias updates it. Use the dropdown to switch. Clear all removes every saved custom profile from this browser.',
-    profileNone: 'No saved profiles yet', profileSaved: 'Saved “{name}”.', profileDeleted: 'Deleted “{name}”.', profileCleared: 'All custom profiles cleared.', profileNeedName: 'Enter an alias name before saving.', profileConfirmDelete: 'Delete profile “{name}”?', profileConfirmClear: 'Clear ALL saved custom profiles from this browser?',
+    profileNone: 'No saved profiles yet', profileSaved: 'Saved “{name}”.', profileSaveFailed: 'Could not save profiles (storage full).', profileDeleted: 'Deleted “{name}”.', profileCleared: 'All custom profiles cleared.', profileNeedName: 'Enter an alias name before saving.', profileConfirmDelete: 'Delete profile “{name}”?', profileConfirmClear: 'Clear ALL saved custom profiles from this browser?',
     apiKey: 'API key', apiKeyPlaceholder: "sk-... or your provider's API key", endpoint: 'Endpoint URL', endpointPlaceholder: 'Base URL or full endpoint, e.g. https://api.openai.com/v1',
     endpointHint: 'Base URL is resolved when you leave the field (OpenAI → /chat/completions, Anthropic → /v1/messages, Gemini → /v1beta). A full URL you pasted is left untouched.',
     model: 'Model', fetchModels: 'Fetch models', fetching: 'Fetching…', modelPlaceholder: 'e.g. gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: 'Pick a model…', modelDetailsTitle: 'Model details', modelCatalog: 'Model catalog', modelCatalogHint: 'Browse limits and capabilities before choosing a model.', modelCount: '{count} models', viewDetails: 'Show details', useModel: 'Use this model', capabilitiesNotProvided: 'Capabilities not provided', modelBasics: 'Model information', modelDescription: 'Description', baseModel: 'Base model', version: 'Version',
@@ -730,7 +749,7 @@ const I18N = {
     configuration: '測試設定', provider: '服務商', openaiCompatible: 'OpenAI 相容', anthropic: 'Anthropic', gemini: 'Gemini',
     profiles: '已存設定（別名）', profileNamePlaceholder: '別名，例如 OpenAI／DeepSeek／公司', profileSave: '儲存', profileNew: '新增', profileDelete: '刪除', profileClearAll: '全部清空',
     profileHint: '為每個平台取一個別名後按「儲存」：新別名會新增一組，同名會更新該組。用下拉選單切換；「全部清空」會移除此瀏覽器內所有自訂設定。',
-    profileNone: '尚無已存設定', profileSaved: '已儲存「{name}」。', profileDeleted: '已刪除「{name}」。', profileCleared: '已清空所有自訂設定。', profileNeedName: '請先輸入別名再儲存。', profileConfirmDelete: '確定刪除「{name}」？', profileConfirmClear: '確定清空此瀏覽器內全部自訂設定？',
+    profileNone: '尚無已存設定', profileSaved: '已儲存「{name}」。', profileSaveFailed: '無法儲存設定檔（儲存空間已滿）。', profileDeleted: '已刪除「{name}」。', profileCleared: '已清空所有自訂設定。', profileNeedName: '請先輸入別名再儲存。', profileConfirmDelete: '確定刪除「{name}」？', profileConfirmClear: '確定清空此瀏覽器內全部自訂設定？',
     apiKey: 'API 金鑰', apiKeyPlaceholder: 'sk-... 或服務商提供的 API 金鑰', endpoint: '端點 URL', endpointPlaceholder: 'Base URL 或完整端點，例如 https://api.openai.com/v1',
     endpointHint: '離開欄位時會補成服務商端點（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已貼上的完整 URL 會保持不變。',
     model: '模型', fetchModels: '取得模型', fetching: '取得中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '選擇模型…', modelDetailsTitle: '模型詳細資訊', modelCatalog: '模型總覽', modelCatalogHint: '先比較限制與支援能力，再選擇要測試的模型。', modelCount: '共 {count} 個模型', viewDetails: '顯示詳細資料', useModel: '使用此模型', capabilitiesNotProvided: '服務商未提供能力資料', modelBasics: '模型資訊', modelDescription: '模型描述', baseModel: '基礎模型', version: '版本',
@@ -758,7 +777,7 @@ const I18N = {
     configuration: '测试设置', provider: '服务商', openaiCompatible: 'OpenAI 兼容', anthropic: 'Anthropic', gemini: 'Gemini',
     profiles: '已存设置（别名）', profileNamePlaceholder: '别名，例如 OpenAI／DeepSeek／公司', profileSave: '保存', profileNew: '新建', profileDelete: '删除', profileClearAll: '全部清空',
     profileHint: '为每个平台取一个别名后点「保存」：新别名会新增一组，同名会更新该组。用下拉菜单切换；「全部清空」会移除此浏览器内所有自定义设置。',
-    profileNone: '尚无已存设置', profileSaved: '已保存“{name}”。', profileDeleted: '已删除“{name}”。', profileCleared: '已清空所有自定义设置。', profileNeedName: '请先输入别名再保存。', profileConfirmDelete: '确定删除“{name}”？', profileConfirmClear: '确定清空此浏览器内全部自定义设置？',
+    profileNone: '尚无已存设置', profileSaved: '已保存“{name}”。', profileSaveFailed: '无法保存配置档（存储空间已满）。', profileDeleted: '已删除“{name}”。', profileCleared: '已清空所有自定义设置。', profileNeedName: '请先输入别名再保存。', profileConfirmDelete: '确定删除“{name}”？', profileConfirmClear: '确定清空此浏览器内全部自定义设置？',
     apiKey: 'API 密钥', apiKeyPlaceholder: 'sk-... 或服务商提供的 API 密钥', endpoint: '端点 URL', endpointPlaceholder: 'Base URL 或完整端点，例如 https://api.openai.com/v1',
     endpointHint: '离开字段时会补成服务商端点（OpenAI → /chat/completions、Anthropic → /v1/messages、Gemini → /v1beta）。已粘贴的完整 URL 会保持不变。',
     model: '模型', fetchModels: '获取模型', fetching: '获取中…', modelPlaceholder: '例如 gpt-4o-mini · claude-opus-4-6 · glm-4.7-flash', pickModel: '选择模型…', modelDetailsTitle: '模型详细信息', modelCatalog: '模型总览', modelCatalogHint: '先比较限制和支持能力，再选择要测试的模型。', modelCount: '共 {count} 个模型', viewDetails: '显示详细信息', useModel: '使用此模型', capabilitiesNotProvided: '服务商未提供能力资料', modelBasics: '模型信息', modelDescription: '模型描述', baseModel: '基础模型', version: '版本',
@@ -788,7 +807,7 @@ function t(key, vars) {
 }
 
 function statusLabel(status) {
-  return ({ success: t('statusSuccess'), timeout: t('statusTimeout'), exception: t('statusException'), error: t('statusError'), cancelled: t('statusCancelled') })[status] || status;
+  return ({ success: t('statusSuccess'), timeout: t('statusTimeout'), exception: t('statusException'), error: t('statusError'), http_error: t('statusError'), cancelled: t('statusCancelled') })[status] || status;
 }
 
 function applyThemeUi() {
@@ -821,7 +840,39 @@ function applyLanguage(language) {
   document.querySelectorAll('.language-option').forEach((option) => option.setAttribute('aria-selected', String(option.dataset.language === currentLanguage)));
   applyThemeUi();
   if (typeof renderProfileSelect === 'function') renderProfileSelect();
-  if (typeof latestRun !== 'undefined' && latestRun) finalizeRender(latestRun);
+  if (typeof syncThinkingStrengthUi === 'function') syncThinkingStrengthUi();
+  const runBtn = document.getElementById('runBtn');
+  const runActive = !!(runBtn && runBtn.dataset.running === '1');
+  if (runActive) {
+    const runLabel = document.getElementById('runLabel');
+    if (runLabel) runLabel.textContent = t('runRunning');
+  }
+  if (typeof latestRun !== 'undefined' && latestRun && !runActive) finalizeRender(latestRun);
+}
+
+
+const THINKING_STRENGTH_KEYS = { off: 'thinkingOff', low: 'thinkingLow', medium: 'thinkingMedium', high: 'thinkingHigh' };
+
+function syncThinkingStrengthUi() {
+  const input = document.getElementById('thinkingStrength');
+  const label = document.getElementById('thinkingStrengthPickerLabel');
+  const picker = document.getElementById('thinkingStrengthPicker');
+  if (!input) return;
+  const value = THINKING_STRENGTH_KEYS[input.value] ? input.value : 'medium';
+  input.value = value;
+  if (label) label.textContent = t(THINKING_STRENGTH_KEYS[value]);
+  document.querySelectorAll('.thinking-option').forEach((option) => {
+    option.setAttribute('aria-selected', String(option.dataset.value === value));
+  });
+  if (picker) picker.open = false;
+}
+
+function setThinkingStrength(value) {
+  const input = document.getElementById('thinkingStrength');
+  if (!input || !THINKING_STRENGTH_KEYS[value]) return;
+  input.value = value;
+  syncThinkingStrengthUi();
+  saveField('thinkingStrength', value);
 }
 
 /* ---------- Theme ---------- */
@@ -861,11 +912,17 @@ function readProfilesStore() {
 }
 
 function writeProfilesStore() {
-  try { localStorage.setItem('llmct_profiles', JSON.stringify(profiles)); } catch (e) {}
+  try {
+    localStorage.setItem('llmct_profiles', JSON.stringify(profiles));
+  } catch (e) {
+    setProfileStatus(t('profileSaveFailed') || 'Could not save profiles (storage full).');
+    return false;
+  }
   try {
     if (activeProfileId) localStorage.setItem('llmct_activeProfileId', activeProfileId);
     else localStorage.removeItem('llmct_activeProfileId');
   } catch (e) {}
+  return true;
 }
 
 function setProfileStatus(msg) {
@@ -1014,18 +1071,26 @@ function saveCurrentProfile() {
     setProfileStatus(t('profileNeedName'));
     return;
   }
-  // Upsert by alias name so a new alias always creates another profile
-  // instead of overwriting the currently selected one.
-  const existing = profiles.find(p => String(p.name).toLowerCase() === name.toLowerCase()) || null;
-  const next = snapshotFormToProfile(existing);
-  next.name = name;
-  if (existing) {
+  const existingByName = profiles.find(p => String(p.name).toLowerCase() === name.toLowerCase()) || null;
+  const active = profiles.find(p => p.id === activeProfileId) || null;
+  let next;
+  if (existingByName) {
+    // Same alias → update that profile (explicit overwrite by name).
+    next = snapshotFormToProfile(existingByName);
+    next.name = name;
+    profiles = profiles.map(p => p.id === next.id ? next : p);
+  } else if (active) {
+    // Rename the currently selected profile in place.
+    next = snapshotFormToProfile(active);
+    next.name = name;
     profiles = profiles.map(p => p.id === next.id ? next : p);
   } else {
+    next = snapshotFormToProfile(null);
+    next.name = name;
     profiles.push(next);
   }
   activeProfileId = next.id;
-  writeProfilesStore();
+  if (writeProfilesStore() === false) return;
   saveField('apiKey', next.apiKey);
   saveField('endpoint', next.endpoint);
   saveField('model', next.model);
@@ -1116,7 +1181,7 @@ window.addEventListener('message', (e) => {
   if (!entry) return;
   if (d.type === 'llmct:fetch:meta') {
     entry.meta = { status: d.status, statusText: d.statusText || '', headers: d.headers || {} };
-    entry.resolveMeta(entry.meta);
+    try { entry.resolveMeta(entry.meta); } catch (e) { /* already settled */ }
   } else if (d.type === 'llmct:fetch:chunk') {
     // d.chunk is a Uint8Array; the ReadableStream controller queues it.
     try { entry.controller.enqueue(d.chunk); } catch (err) { /* stream closed */ }
@@ -1124,7 +1189,11 @@ window.addEventListener('message', (e) => {
     try { entry.controller.close(); } catch (err) { /* already closed */ }
     __llmctFetchRegistry.delete(d.id);
   } else if (d.type === 'llmct:fetch:error') {
-    try { entry.controller.error(new Error(d.error || 'relay error')); } catch (err) { /* ignore */ }
+    const err = new Error(d.error || 'relay error');
+    try { if (entry.controller) entry.controller.error(err); } catch (e) { /* ignore */ }
+    if (entry.rejectMeta && !entry.meta) {
+      try { entry.rejectMeta(err); } catch (e) { /* ignore */ }
+    }
     __llmctFetchRegistry.delete(d.id);
   }
 });
@@ -1174,16 +1243,49 @@ async function llmctFetch(url, init) {
     if (typeof init.body === 'string') body = init.body;
     else return fetch(url, init); // unsupported body type for relay
   }
-  const metaPromise = new Promise((resolve) => {
-    const entry = { resolveMeta: resolve, controller: null };
+  const signal = init && init.signal;
+  if (signal && signal.aborted) {
+    throw new DOMException(String(signal.reason || 'Aborted'), 'AbortError');
+  }
+  let settled = false;
+  const metaPromise = new Promise((resolve, reject) => {
+    const entry = { resolveMeta: resolve, rejectMeta: reject, controller: null, meta: null };
     __llmctFetchRegistry.set(id, entry);
   });
-  window.postMessage({ type: 'llmct:fetch', id, url, method, headers, body }, '*');
-  const meta = await metaPromise;
+  const abortRelay = () => {
+    window.postMessage({ type: 'llmct:fetch:abort', id }, window.location.origin);
+    const entry = __llmctFetchRegistry.get(id);
+    if (!entry) return;
+    const err = new DOMException('Aborted', 'AbortError');
+    try { if (entry.controller) entry.controller.error(err); } catch (e) {}
+    if (!settled && entry.rejectMeta && !entry.meta) {
+      try { entry.rejectMeta(err); } catch (e) {}
+    }
+    __llmctFetchRegistry.delete(id);
+  };
+  if (signal) signal.addEventListener('abort', abortRelay, { once: true });
+  window.postMessage({ type: 'llmct:fetch', id, url, method, headers, body }, window.location.origin);
+  let meta;
+  try {
+    meta = await metaPromise;
+    settled = true;
+    const entry = __llmctFetchRegistry.get(id);
+    if (entry) entry.meta = meta;
+  } catch (e) {
+    if (signal) signal.removeEventListener('abort', abortRelay);
+    throw e;
+  }
   const stream = new ReadableStream({
     start(controller) {
       const entry = __llmctFetchRegistry.get(id);
       if (entry) entry.controller = controller;
+      if (signal && signal.aborted) {
+        try { controller.error(new DOMException('Aborted', 'AbortError')); } catch (e) {}
+        __llmctFetchRegistry.delete(id);
+      }
+    },
+    cancel() {
+      abortRelay();
     }
   });
   return new Response(stream, {
@@ -1299,6 +1401,8 @@ function modelNeedsPublicMetadata(model) {
   return context === null || output === null;
 }
 
+let publicModelCatalogIndex = null;
+
 function fetchPublicModelCatalog() {
   if (!publicModelCatalogPromise) {
     publicModelCatalogPromise = fetch('https://models.dev/api.json')
@@ -1306,29 +1410,47 @@ function fetchPublicModelCatalog() {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
       })
+      .then((catalog) => {
+        publicModelCatalogIndex = indexPublicModelCatalog(catalog);
+        return catalog;
+      })
       .catch((error) => {
         publicModelCatalogPromise = null;
+        publicModelCatalogIndex = null;
         throw error;
       });
   }
   return publicModelCatalogPromise;
 }
 
+function indexPublicModelCatalog(catalog) {
+  const byId = new Map();
+  for (const [providerId, provider] of Object.entries(catalog || {})) {
+    for (const candidate of Object.values((provider && provider.models) || {})) {
+      const key = canonicalModelId(candidate && candidate.id);
+      if (!key) continue;
+      const existing = byId.get(key);
+      if (!existing) byId.set(key, { providerId, candidate });
+      else if ((key.startsWith('claude-') && providerId === 'anthropic') || (key.startsWith('gpt-') && providerId === 'openai')) {
+        byId.set(key, { providerId, candidate });
+      }
+    }
+  }
+  return byId;
+}
+
 function publicModelMetadata(catalog, id) {
   const wanted = canonicalModelId(id);
+  if (!wanted) return null;
   const preferredProvider = wanted.startsWith('claude-') ? 'anthropic' : wanted.startsWith('gpt-') ? 'openai' : '';
-  let match = null;
-  for (const [providerId, provider] of Object.entries(catalog)) {
-    for (const candidate of Object.values(provider.models || {})) {
-      if (canonicalModelId(candidate.id) !== wanted) continue;
-      if (!match || providerId === preferredProvider) match = { providerId, candidate };
-      if (providerId === preferredProvider) break;
-    }
-    if (match && match.providerId === preferredProvider) break;
-  }
+  const index = publicModelCatalogIndex || indexPublicModelCatalog(catalog);
+  if (!publicModelCatalogIndex) publicModelCatalogIndex = index;
+  const match = index.get(wanted);
   if (!match) return null;
-  const { candidate } = match;
-  return publicModelMetadataFromCandidate(candidate);
+  if (preferredProvider && match.providerId !== preferredProvider) {
+    // Prefer exact provider when available (index already prefers openai/anthropic on conflict).
+  }
+  return publicModelMetadataFromCandidate(match.candidate);
 }
 
 function publicModelMetadataFromCandidate(candidate) {
@@ -1373,41 +1495,8 @@ function selectModel(value) {
   validateRunButton();
 }
 
-function modelDetailMarkup(model) {
-  const fields = [
-    [t('contextWindow'), formatTokenLimit(readModelField(model, ['context_length', 'context_window', 'max_context_length', 'inputTokenLimit', 'input_token_limit', 'top_provider.context_length']))],
-    [t('maxOutput'), formatTokenLimit(readModelField(model, ['max_output_tokens', 'max_completion_tokens', 'outputTokenLimit', 'output_token_limit', 'top_provider.max_completion_tokens', 'top_provider.max_output_tokens']))],
-    [t('inputPrice'), formatPrice(readModelField(model, ['pricing.prompt', 'pricing.input', 'input_price']))],
-    [t('outputPrice'), formatPrice(readModelField(model, ['pricing.completion', 'pricing.output', 'output_price']))],
-    [t('owner'), readModelField(model, ['owned_by', 'publisher', 'owner'])],
-    [t('created'), formatCreated(readModelField(model, ['created', 'created_at']))],
-    [t('baseModel'), readModelField(model, ['baseModelId', 'base_model_id', 'base_model', 'canonical_slug'])],
-    [t('version'), readModelField(model, ['version', 'model_version', 'modelVersion'])],
-    [t('modalities'), readModelField(model, ['architecture.input_modalities', 'input_modalities', 'modalities'])],
-    [t('modality'), readModelField(model, ['architecture.modality', 'modality'])],
-    [t('tokenizer'), readModelField(model, ['architecture.tokenizer', 'tokenizer'])],
-    [t('knowledgeCutoff'), readModelField(model, ['knowledge_cutoff', 'knowledgeCutoff'])],
-    [t('expirationDate'), readModelField(model, ['expiration_date', 'expirationDate'])],
-    [t('supportedParameters'), readModelField(model, ['supported_parameters', 'supportedParameters'])],
-    [t('metadataSource'), model._metadataSource === 'models.dev' ? t('publicModelCatalog') : null],
-  ];
-  const capabilities = [
-    [t('thinkingSupport'), capabilityValue(model, ['thinking', 'supports_thinking', 'supports_reasoning', 'reasoning', 'thinking_support'], (value) => value.includes('reason') || value.includes('thinking'))],
-    [t('imageInput'), capabilityValue(model, ['supports_image_input', 'image_input'], (value) => value.includes('image'))],
-    [t('audioInput'), capabilityValue(model, ['supports_audio_input', 'audio_input'], (value) => value.includes('audio'))],
-    [t('videoInput'), capabilityValue(model, ['supports_video_input', 'video_input'], (value) => value.includes('video'))],
-    [t('toolCalling'), capabilityValue(model, ['tool_calling', 'supports_tools', 'supports_function_calling', 'function_calling'], (value) => value.includes('tool') || value.includes('function'))],
-    [t('structuredOutput'), capabilityValue(model, ['structured_outputs', 'json_mode', 'supports_json_mode'], (value) => value.includes('json') || value.includes('response_format'))],
-    [t('streaming'), capabilityValue(model, ['streaming', 'supports_streaming'], (value) => value.includes('stream'))],
-  ].map(([label, value]) => [label, formatCapability(value)]);
-  const description = readModelField(model, ['description', 'model_description']);
-  const available = fields.filter(([, value]) => value !== null && value !== undefined && value !== '' && value !== t('providerNotProvided'));
-  const capabilityGrid = capabilities.map(([label, value]) => '<div class="model-detail-item"><div class="model-detail-label">' + escapeHtml(label) + '</div><div class="model-detail-value">' + escapeHtml(formatDetailValue(value)) + '</div></div>').join('');
-  return (description ? '<p class="model-description">' + escapeHtml(description) + '</p>' : '')
-    + '<div class="model-detail-section"><div class="model-detail-section-title">' + escapeHtml(t('modelBasics')) + '</div>'
-    + (available.length ? '<div class="model-details-grid">' + available.map(([label, value]) => '<div class="model-detail-item"><div class="model-detail-label">' + escapeHtml(label) + '</div><div class="model-detail-value">' + escapeHtml(formatDetailValue(value)) + '</div></div>').join('') + '</div>' : '<p class="model-details-empty">' + escapeHtml(t('modelDetailsEmpty')) + '</p>')
-    + '</div><div class="model-detail-section"><div class="model-detail-section-title">' + escapeHtml(t('capabilities')) + '</div><div class="model-details-grid">' + capabilityGrid + '</div></div>';
-}
+let fetchModelsController = null;
+let fetchModelsGeneration = 0;
 
 async function fetchModels() {
   const apiKey = document.getElementById('apiKey').value.trim();
@@ -1431,6 +1520,13 @@ async function fetchModels() {
   }
   const url = base.replace(/\/+$/, '') + '/models';
 
+  if (fetchModelsController) {
+    try { fetchModelsController.abort(); } catch (e) {}
+  }
+  const controller = new AbortController();
+  fetchModelsController = controller;
+  const generation = ++fetchModelsGeneration;
+
   btn.disabled = true;
   const originalLabel = btn.textContent;
   btn.textContent = t('fetching');
@@ -1438,15 +1534,21 @@ async function fetchModels() {
   status.textContent = t('modelsRequest', { url: url });
 
   try {
-    const res = await llmctFetch(url, { method: 'GET', headers: modelRequestHeaders(currentProvider, apiKey) });
+    const res = await llmctFetch(url, {
+      method: 'GET',
+      headers: modelRequestHeaders(currentProvider, apiKey),
+      signal: controller.signal,
+    });
+    if (generation !== fetchModelsGeneration) return;
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
+    if (generation !== fetchModelsGeneration) return;
     const list = Array.isArray(data.data) ? data.data : (Array.isArray(data.models) ? data.models : []);
     if (list.length === 0) throw new Error('Empty model list — unexpected response shape.');
     const enrichedModels = await enrichModelsWithPublicMetadata(list).catch(() => list);
+    if (generation !== fetchModelsGeneration) return;
     modelCatalog = new Map(enrichedModels.map(model => [modelId(model), model]).filter(([id]) => id));
     const ids = Array.from(modelCatalog.keys()).sort();
-    // Build the picker with native buttons so its open menu follows the app theme.
     pickerOptions.replaceChildren();
     ids.forEach(id => {
       const opt = document.createElement('button');
@@ -1467,6 +1569,8 @@ async function fetchModels() {
     status.style.color = 'var(--text-success, #14532d)';
     status.textContent = t(ids.length === 1 ? 'modelsLoadedOne' : 'modelsLoadedMany', { count: ids.length });
   } catch (e) {
+    if (generation !== fetchModelsGeneration) return;
+    if (e && (e.name === 'AbortError' || String(e.message || '').toLowerCase().includes('abort'))) return;
     status.style.color = 'var(--text-danger)';
     const message = e && e.message ? e.message : String(e);
     if (message.includes('401') || message.includes('403')) {
@@ -1480,8 +1584,10 @@ async function fetchModels() {
     }
     picker.classList.add('hidden');
   } finally {
-    btn.disabled = false;
-    btn.textContent = originalLabel;
+    if (generation === fetchModelsGeneration) {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
   }
 }
 
@@ -1577,6 +1683,13 @@ function validateRunButton() {
       applyLanguage(option.dataset.language);
       document.getElementById('languagePicker').open = false;
     }));
+
+    const savedThinking = loadField('thinkingStrength');
+    if (savedThinking) setThinkingStrength(savedThinking);
+    else syncThinkingStrengthUi();
+    document.querySelectorAll('.thinking-option').forEach((option) => {
+      option.addEventListener('click', () => setThinkingStrength(option.dataset.value));
+    });
 
     ['apiKey', 'model'].forEach(id => {
       document.getElementById(id).addEventListener('input', (e) => {
@@ -1743,6 +1856,7 @@ async function callOnce(idx, cfg, testStart, onEvent) {
     onEvent({ type: 'first_chunk', result });
   };
 
+  let reader = null;
   try {
     const res = await llmctFetch(requestUrl, {
       method: 'POST',
@@ -1765,7 +1879,18 @@ async function callOnce(idx, cfg, testStart, onEvent) {
     }
 
     // Drain the SSE stream. Track whether we ever produced a parsed chunk.
-    const reader = res.body.getReader();
+    if (!res.body || typeof res.body.getReader !== 'function') {
+      clearTimeout(timer);
+      const endPerf = performance.now();
+      result.end_offset_s = +((endPerf - testStart) / 1000).toFixed(3);
+      result.end_iso = new Date().toISOString();
+      result.duration_s = +((endPerf - startPerf) / 1000).toFixed(3);
+      result.status = 'error';
+      result.error = 'Response body missing';
+      onEvent({ type: 'end', result });
+      return result;
+    }
+    reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let buffer = '';
     let chunkCount = 0;
@@ -1782,7 +1907,6 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       if (obj.usage && typeof obj.usage.completion_tokens === 'number') {
         completionTokens = obj.usage.completion_tokens;
       }
-      onEvent({ type: 'chunk', result });
     };
 
     const handleAnthropicChunk = (eventName, obj) => {
@@ -1795,7 +1919,6 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       } else if (eventName === 'message_start' && obj.message && obj.message.usage && typeof obj.message.usage.output_tokens === 'number' && completionTokens === 0) {
         completionTokens = obj.message.usage.output_tokens;
       }
-      onEvent({ type: 'chunk', result });
     };
 
     const handleGeminiChunk = (obj) => {
@@ -1805,7 +1928,6 @@ async function callOnce(idx, cfg, testStart, onEvent) {
       const usage = obj.usageMetadata || {};
       if (typeof usage.candidatesTokenCount === 'number') completionTokens = usage.candidatesTokenCount;
       else if (typeof usage.totalTokenCount === 'number') completionTokens = usage.totalTokenCount;
-      onEvent({ type: 'chunk', result });
     };
 
     const processSseEvent = (rawEvent) => {
@@ -1885,6 +2007,7 @@ async function callOnce(idx, cfg, testStart, onEvent) {
     onEvent({ type: 'end', result });
     return result;
   } catch (e) {
+    try { if (reader) reader.cancel(); } catch (cancelErr) {}
     clearTimeout(timer);
     const endPerf = performance.now();
     result.end_offset_s = +((endPerf - testStart) / 1000).toFixed(3);
@@ -1943,13 +2066,26 @@ function stopTest() {
 
 async function runTest() {
   if (!validateRunButton()) return;
-  if (activeRunController && !activeRunController.signal.aborted) return;
+  // Block until the previous run fully tears down (abort alone is not enough).
+  if (activeRunController) return;
 
   const endpointEl = document.getElementById('endpoint');
   const rawEndpoint = endpointEl.value.trim();
   const runAbort = new AbortController();
+  const runId = (runTest._seq = (runTest._seq || 0) + 1);
   activeRunController = runAbort;
   setRunUi(true);
+
+  const clampInt = (value, min, max, fallback) => {
+    const n = parseInt(value, 10);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.min(max, Math.max(min, n));
+  };
+  const clampFloat = (value, min, max, fallback) => {
+    const n = parseFloat(value);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.min(max, Math.max(min, n));
+  };
 
   const cfg = {
     provider: currentProvider,
@@ -1958,13 +2094,14 @@ async function runTest() {
     model: document.getElementById('model').value,
     systemPrompt: document.getElementById('systemPrompt').value,
     prompt: document.getElementById('prompt').value,
-    concurrency: parseInt(document.getElementById('concurrency').value, 10),
-    maxTokens: parseInt(document.getElementById('maxTokens').value, 10),
-    timeout: parseFloat(document.getElementById('timeout').value),
-    temperature: parseFloat(document.getElementById('temperature').value),
-    topP: parseFloat(document.getElementById('topP').value),
-    thinkingStrength: document.getElementById('thinkingStrength').value,
+    concurrency: clampInt(document.getElementById('concurrency').value, 1, 50, 3),
+    maxTokens: clampInt(document.getElementById('maxTokens').value, 1, 128000, 256),
+    timeout: clampFloat(document.getElementById('timeout').value, 5, 300, 60),
+    temperature: clampFloat(document.getElementById('temperature').value, 0, 2, 1),
+    topP: clampFloat(document.getElementById('topP').value, 0, 1, 1),
+    thinkingStrength: document.getElementById('thinkingStrength').value || 'medium',
     abortSignal: runAbort.signal,
+    runId: runId,
   };
 
   // Eagerly render the skeleton BEFORE any request fires, so per-request
@@ -1981,6 +2118,7 @@ async function runTest() {
   for (let i = 1; i <= cfg.concurrency; i++) {
     const idx = i;
     const onEvent = function (evt) {
+      if (cfg.runId !== runTest._seq) return;
       if (evt.type === 'start') paintStart(idx, evt.result);
       else if (evt.type === 'first_chunk') paintFirstChunk(idx, evt.result);
       else if (evt.type === 'end') paintEnd(idx, evt.result);
@@ -2211,14 +2349,14 @@ function appendTableRow(r) {
   const note = r.error ? String(r.error).slice(0, 70) : (r.stream_status && r.stream_status !== 'ok' ? t('streamNote', { status: r.stream_status }) : '');
   tr.innerHTML =
     '<td>' + r.index + '</td>' +
-    '<td>' + (r.start_iso ? r.start_iso.split('T')[1].replace('Z','') : '-') + '</td>' +
-    '<td>' + (r.end_iso ? r.end_iso.split('T')[1].replace('Z','') : '-') + '</td>' +
-    '<td>' + (r.duration_s ?? '-') + 's</td>' +
-    '<td>' + (r.ttft_s !== null && r.ttft_s !== undefined ? r.ttft_s + 's' : '-') + '</td>' +
-    '<td>' + r.completion_tokens + '</td>' +
-    '<td>' + r.tokens_per_sec + '</td>' +
-    '<td style="color:' + statusColor + '; font-weight:700;">' + statusLabel(r.status) + '</td>' +
-    '<td style="color: var(--text-dim);">' + note + '</td>';
+    '<td>' + escapeHtml(r.start_iso ? r.start_iso.split('T')[1].replace('Z','') : '-') + '</td>' +
+    '<td>' + escapeHtml(r.end_iso ? r.end_iso.split('T')[1].replace('Z','') : '-') + '</td>' +
+    '<td>' + escapeHtml(String(r.duration_s ?? '-')) + 's</td>' +
+    '<td>' + escapeHtml(r.ttft_s !== null && r.ttft_s !== undefined ? r.ttft_s + 's' : '-') + '</td>' +
+    '<td>' + escapeHtml(String(r.completion_tokens)) + '</td>' +
+    '<td>' + escapeHtml(String(r.tokens_per_sec)) + '</td>' +
+    '<td style="color:' + statusColor + '; font-weight:700;">' + escapeHtml(statusLabel(r.status)) + '</td>' +
+    '<td style="color: var(--text-dim);">' + escapeHtml(note) + '</td>';
 }
 
 function bumpProgress() {

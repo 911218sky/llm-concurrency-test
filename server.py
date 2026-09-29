@@ -73,9 +73,19 @@ class LocalHandler(BaseHTTPRequestHandler):
                 if name.lower() not in HOP_BY_HOP_HEADERS:
                     self.send_header(name, value)
             self.end_headers()
-            while chunk := upstream.read(64 * 1024):
-                self.wfile.write(chunk)
-                self.wfile.flush()
+            # Small reads keep SSE TTFT low; write failures mean the browser aborted.
+            try:
+                while chunk := upstream.read(4 * 1024):
+                    try:
+                        self.wfile.write(chunk)
+                        self.wfile.flush()
+                    except (BrokenPipeError, ConnectionResetError, OSError):
+                        break
+            finally:
+                try:
+                    upstream.close()
+                except Exception:
+                    pass
 
     def _read_json(self) -> dict[str, JsonValue]:
         length_text = self.headers.get("Content-Length", "0")
@@ -120,7 +130,7 @@ class LocalHandler(BaseHTTPRequestHandler):
         upstream_headers = dict(headers)
         upstream_headers.setdefault("User-Agent", DEFAULT_USER_AGENT)
         request = urllib.request.Request(url, data=body, headers=upstream_headers, method=method)
-        return urllib.request.urlopen(request, timeout=90)
+        return urllib.request.urlopen(request, timeout=320)
 
     def _send_upstream_error(self, error: urllib.error.HTTPError) -> None:
         body = error.read()
