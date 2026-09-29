@@ -100,7 +100,9 @@
     --panel-shadow: rgba(26, 26, 26, 0.14);
     --text: #1a1a1a;
     --text-dim: #4a4a4a;
-    --accent-yellow: #ffcf7a;
+    --accent-yellow: #e0b56a;
+    --accent-muted: color-mix(in srgb, var(--accent-yellow) 34%, var(--bg-input));
+    --focus-ring: color-mix(in srgb, var(--accent-yellow) 38%, transparent);
     --accent-green-btn: #a8f0c6;
     --fill-success: #a8f0c6;
     --text-success: #14532d;
@@ -121,7 +123,9 @@
     --panel-shadow: rgba(0, 0, 0, 0.32);
     --text: #f2f3ee;
     --text-dim: #aab3b1;
-    --accent-yellow: #c8e45f;
+    --accent-yellow: #9aaa62;
+    --accent-muted: color-mix(in srgb, var(--accent-yellow) 30%, var(--bg-input));
+    --focus-ring: color-mix(in srgb, var(--accent-yellow) 32%, transparent);
     --accent-green-btn: #67c996;
     --fill-success: #173b2a;
     --text-success: #a8e8bb;
@@ -148,8 +152,8 @@
   button, a, input, select, textarea { color: var(--text); }
   a { color: inherit; }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-    outline: 3px solid var(--accent-yellow);
-    outline-offset: 3px;
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
   }
   .app-header { min-height: 4.5rem; }
   .app-main { width: 100%; }
@@ -174,15 +178,41 @@
     background-image: none !important;
   }
   .language-select option { background-color: var(--bg-header); color: var(--text); }
-  .language-picker { position: relative; min-width: 8.25rem; }
-  .language-picker summary { display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; min-height: 2.25rem; padding: 0.35rem 0.65rem; cursor: pointer; list-style: none; background: var(--bg-header); }
-  .language-picker summary::-webkit-details-marker { display: none; }
-  .language-picker summary::after { content: ''; width: 0.5rem; height: 0.5rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; color: var(--text-dim); transform: rotate(45deg) translateY(-2px); }
-  .language-picker[open] summary::after { transform: rotate(225deg) translateY(-2px); }
-  .language-picker-options { position: absolute; top: calc(100% + 0.35rem); right: 0; z-index: 30; min-width: 100%; overflow: hidden; border: 2px solid var(--border-color); border-radius: 8px; background: var(--bg-panel); box-shadow: 0 8px 18px var(--panel-shadow); }
-  .language-option { display: block; width: 100%; padding: 0.65rem 0.75rem; border: 0; border-bottom: 1px solid var(--border-color); background: transparent; color: var(--text); cursor: pointer; text-align: left; font-size: 0.82rem; font-weight: 700; white-space: nowrap; }
-  .language-option:last-child { border-bottom: 0; }
-  .language-option:hover, .language-option[aria-selected="true"] { background: var(--accent-yellow); color: var(--text); }
+  /* Shared themed dropdown menus */
+  .theme-menu { position: relative; min-width: 0; }
+  .theme-menu > summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.65rem;
+    min-height: 2.25rem; padding: 0.4rem 0.65rem; cursor: pointer; list-style: none;
+    background: var(--bg-input); color: var(--text); font-weight: 700;
+  }
+  .theme-menu > summary::-webkit-details-marker { display: none; }
+  .theme-menu > summary::after {
+    content: ''; width: 0.5rem; height: 0.5rem; flex: 0 0 auto;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    color: var(--text-dim); transform: rotate(45deg) translateY(-2px);
+  }
+  .theme-menu[open] > summary::after { transform: rotate(225deg) translateY(-2px); }
+  .theme-menu-options {
+    position: absolute; top: calc(100% + 0.35rem); left: 0; right: 0; z-index: 30;
+    max-height: 16rem; overflow-y: auto; min-width: 100%;
+    border: 2px solid var(--border-color); border-radius: 8px;
+    background: var(--bg-panel); box-shadow: 0 8px 18px var(--panel-shadow);
+  }
+  .theme-menu-option {
+    display: block; width: 100%; padding: 0.6rem 0.75rem; border: 0;
+    border-bottom: 1px solid var(--border-color); background: transparent;
+    color: var(--text); cursor: pointer; text-align: left;
+    font-size: 0.82rem; font-weight: 700; overflow-wrap: anywhere;
+  }
+  .theme-menu-option:last-child { border-bottom: 0; }
+  .theme-menu-option:hover,
+  .theme-menu-option[aria-selected="true"] {
+    background: var(--accent-muted); color: var(--text);
+  }
+  .language-picker { min-width: 8.25rem; }
+  .language-picker > summary { background: var(--bg-header); }
+  .language-picker-options { right: 0; left: auto; }
+  .language-option { white-space: nowrap; }
   .model-details {
     position: fixed;
     inset: 0 0 0 auto;
@@ -281,7 +311,7 @@
     overflow-wrap: anywhere;
   }
   .model-option:last-child { border-bottom: 0; }
-  .model-option:hover, .model-option[aria-selected="true"] { background-color: var(--accent-yellow); color: var(--text); }
+  .model-option:hover, .model-option[aria-selected="true"] { background-color: var(--accent-muted); color: var(--text); }
   html.dark .model-picker summary { border-color: #68756f; background-color: #1b2224; }
   html.dark .model-picker-options { border-color: #68756f; background-color: #1b2224; box-shadow: 5px 5px 0 #080b0c; }
   html.dark .model-option { border-bottom-color: #3f4b47; color: #e5ebe7; }
@@ -319,9 +349,9 @@
   }
   html.dark select.neo-input option { background-color: var(--bg-panel); color: var(--text); }
   html.dark input[type="number"]::-webkit-inner-spin-button { filter: invert(0.85); }
-  .neo-input:focus { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-yellow) 70%, transparent); }
+  .neo-input:focus { outline: none; box-shadow: 0 0 0 3px var(--focus-ring); }
   .neo-button {
-    background-color: var(--accent-yellow);
+    background-color: color-mix(in srgb, var(--accent-yellow) 72%, var(--bg-panel));
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-weight: 700;
@@ -363,11 +393,11 @@
   .provider-toggle { display: flex; width: fit-content; max-width: 100%; border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; background-color: var(--bg-header); }
   .provider-btn { padding: 0.65rem 1rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; background-color: transparent; color: var(--text); }
   .provider-btn + .provider-btn { border-left: 2px solid var(--border-color); }
-  .provider-btn.active { background-color: var(--accent-yellow); }
+  .provider-btn.active { background-color: var(--accent-muted); }
   html.dark .provider-btn.active { background-color: #3b4b3b; color: #e7f1bf; }
   .provider-btn:hover:not(.active), .neo-border:hover:not(button) { background-color: var(--bg-input) !important; }
   .provider-btn:active { transform: translateY(1px); }
-  .provider-btn:focus-visible { outline: 0; box-shadow: inset 0 0 0 3px var(--accent-yellow); }
+  .provider-btn:focus-visible { outline: 0; box-shadow: inset 0 0 0 3px var(--focus-ring); }
   .model-option { transition: background-color 0.12s ease, color 0.12s ease; }
   .data-table-wrap { overflow-x: auto; border: 2px solid var(--border-color); border-radius: 10px; background-color: var(--bg-panel); }
   .data-table { min-width: 52rem; }
@@ -423,7 +453,7 @@
     line-height: 1.2;
   }
   .profiles-actions .profile-save-btn {
-    background-color: color-mix(in srgb, var(--accent-yellow) 28%, var(--bg-input)) !important;
+    background-color: var(--accent-muted) !important;
     color: var(--text) !important;
   }
   .profiles-actions .profile-danger-btn { color: var(--text-danger) !important; }
@@ -434,11 +464,24 @@
     min-width: 0;
     min-height: 0 !important;
     height: auto !important;
+  }
+  input.profile-select {
     padding: 0.45rem 0.65rem !important;
     font-size: 0.85rem !important;
     font-weight: 600 !important;
     line-height: 1.25 !important;
   }
+  .profile-picker {
+    padding: 0 !important;
+    background: transparent !important;
+    border-width: 2px !important;
+  }
+  .profile-picker > summary {
+    min-height: 2.35rem;
+    padding: 0.4rem 0.65rem !important;
+    font-size: 0.85rem !important;
+  }
+  .profile-picker-options { left: 0; right: 0; }
   @media (max-width: 640px) {
     .profiles-box { padding: 0.6rem; }
     .profiles-row .profile-select {
@@ -446,7 +489,8 @@
       width: 100% !important;
       flex-basis: auto !important;
     }
-    .profile-select { padding: 0.4rem 0.55rem !important; font-size: 0.8rem !important; }
+    input.profile-select { padding: 0.4rem 0.55rem !important; font-size: 0.8rem !important; }
+    .profile-picker > summary { font-size: 0.8rem !important; padding: 0.35rem 0.55rem !important; }
     .profiles-actions .neo-border { flex: 1 1 calc(50% - 0.4rem); text-align: center; padding: 0.45rem 0.4rem; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -471,12 +515,12 @@
     <span id="themeLabel" class="header-btn-label" data-i18n="themeDark">Dark mode</span>
   </button>
   <span class="sr-only" id="languageLabel" data-i18n="language">Language</span>
-  <details id="languagePicker" class="language-picker neo-border" aria-labelledby="languageLabel">
+  <details id="languagePicker" class="theme-menu language-picker neo-border" aria-labelledby="languageLabel">
     <summary><span id="languagePickerLabel">English</span></summary>
-    <div class="language-picker-options" role="listbox" aria-label="Language">
-      <button type="button" class="language-option" data-language="zh-Hant" role="option" aria-selected="false">繁體中文</button>
-      <button type="button" class="language-option" data-language="zh-Hans" role="option" aria-selected="false">简体中文</button>
-      <button type="button" class="language-option" data-language="en" role="option" aria-selected="true">English</button>
+    <div class="theme-menu-options language-picker-options" role="listbox" aria-label="Language">
+      <button type="button" class="theme-menu-option language-option" data-language="zh-Hant" role="option" aria-selected="false">繁體中文</button>
+      <button type="button" class="theme-menu-option language-option" data-language="zh-Hans" role="option" aria-selected="false">简体中文</button>
+      <button type="button" class="theme-menu-option language-option" data-language="en" role="option" aria-selected="true">English</button>
     </div>
   </details>
   </div>
@@ -518,9 +562,12 @@
     <div class="space-y-6">
 
       <div class="profiles-box">
-        <label class="label-text" for="profileSelect" data-i18n="profiles">SAVED PROFILES</label>
+        <label class="label-text" for="profileName" data-i18n="profiles">SAVED PROFILES</label>
         <div class="profiles-row">
-          <select id="profileSelect" class="neo-input profile-select" aria-label="Saved profiles"></select>
+          <details id="profilePicker" class="theme-menu profile-picker neo-border profile-select">
+            <summary><span id="profilePickerLabel" data-i18n="profileNone">No saved profiles yet</span></summary>
+            <div id="profilePickerOptions" class="theme-menu-options profile-picker-options" role="listbox" aria-label="Saved profiles"></div>
+          </details>
           <input id="profileName" class="neo-input profile-select" type="text" value="" data-i18n-placeholder="profileNamePlaceholder" placeholder="Alias, e.g. OpenAI / DeepSeek / Work" autocomplete="off"/>
         </div>
         <div class="profiles-actions" style="margin-top: 0.45rem;">
@@ -862,32 +909,49 @@ function applyProfileToForm(profile, opts) {
 }
 
 function renderProfileSelect() {
-  const select = document.getElementById('profileSelect');
-  if (!select) return;
+  const picker = document.getElementById('profilePicker');
+  const label = document.getElementById('profilePickerLabel');
+  const options = document.getElementById('profilePickerOptions');
+  if (!picker || !label || !options) return;
   const previous = activeProfileId;
-  select.innerHTML = '';
+  options.replaceChildren();
   if (!profiles.length) {
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = t('profileNone');
-    select.appendChild(opt);
-    select.value = '';
+    activeProfileId = null;
+    label.textContent = t('profileNone');
+    const empty = document.createElement('button');
+    empty.type = 'button';
+    empty.className = 'theme-menu-option';
+    empty.disabled = true;
+    empty.textContent = t('profileNone');
+    options.appendChild(empty);
     return;
   }
+  let active = profiles.find(p => p.id === activeProfileId) || null;
+  if (!active && previous !== null) {
+    active = profiles[0];
+    activeProfileId = active.id;
+  }
+  label.textContent = active ? (active.name || active.id) : t('profileNew');
   profiles
     .slice()
     .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }))
     .forEach((profile) => {
-      const opt = document.createElement('option');
-      opt.value = profile.id;
-      opt.textContent = profile.name || profile.id;
-      select.appendChild(opt);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'theme-menu-option';
+      btn.dataset.profileId = profile.id;
+      btn.setAttribute('role', 'option');
+      btn.setAttribute('aria-selected', String(!!active && profile.id === active.id));
+      btn.textContent = profile.name || profile.id;
+      btn.addEventListener('click', () => {
+        const next = profiles.find(p => p.id === profile.id);
+        if (!next) return;
+        applyProfileToForm(next, { autoFetch: true });
+        setProfileStatus('');
+        picker.open = false;
+      });
+      options.appendChild(btn);
     });
-  if (previous && profiles.some(p => p.id === previous)) select.value = previous;
-  else {
-    select.value = profiles[0].id;
-    activeProfileId = profiles[0].id;
-  }
 }
 
 function migrateLegacyProfile() {
@@ -897,9 +961,15 @@ function migrateLegacyProfile() {
   const model = loadField('model') || '';
   const provider = loadField('provider') || 'openai';
   if (!(apiKey || endpoint || model)) return;
+  let migratedName = '';
+  try {
+    const host = endpoint ? new URL(endpoint).hostname : '';
+    migratedName = (host || '').replace(/^www\./, '');
+  } catch (e) { migratedName = ''; }
+  if (!migratedName) migratedName = String(model || provider || 'profile').slice(0, 32);
   const profile = {
     id: newProfileId(),
-    name: 'Default',
+    name: migratedName,
     provider: ['openai', 'anthropic', 'gemini'].includes(provider) ? provider : 'openai',
     apiKey, endpoint, model,
     updatedAt: Date.now()
@@ -910,15 +980,22 @@ function migrateLegacyProfile() {
 }
 
 function initProfiles() {
-  profiles = readProfilesStore().map((p) => ({
-    id: p.id || newProfileId(),
-    name: String(p.name || '').trim() || 'Untitled',
-    provider: ['openai', 'anthropic', 'gemini'].includes(p.provider) ? p.provider : 'openai',
-    apiKey: p.apiKey || '',
-    endpoint: p.endpoint || '',
-    model: p.model || '',
-    updatedAt: p.updatedAt || Date.now()
-  }));
+  profiles = readProfilesStore().map((p) => {
+    let name = String(p.name || '').trim();
+    if (!name || /^default$/i.test(name)) {
+      try { name = p.endpoint ? new URL(p.endpoint).hostname.replace(/^www\./, '') : ''; } catch (e) { name = ''; }
+      if (!name) name = String(p.model || p.id || newProfileId()).slice(0, 32);
+    }
+    return {
+      id: p.id || newProfileId(),
+      name,
+      provider: ['openai', 'anthropic', 'gemini'].includes(p.provider) ? p.provider : 'openai',
+      apiKey: p.apiKey || '',
+      endpoint: p.endpoint || '',
+      model: p.model || '',
+      updatedAt: p.updatedAt || Date.now()
+    };
+  });
   try { activeProfileId = localStorage.getItem('llmct_activeProfileId'); } catch (e) { activeProfileId = null; }
   migrateLegacyProfile();
   renderProfileSelect();
@@ -928,17 +1005,7 @@ function initProfiles() {
     document.getElementById('profileName').value = '';
     setProfileStatus('');
   }
-  const select = document.getElementById('profileSelect');
-  if (select && !profileUiReady) {
-    select.addEventListener('change', () => {
-      const profile = profiles.find(p => p.id === select.value);
-      if (profile) {
-        applyProfileToForm(profile, { autoFetch: true });
-        setProfileStatus('');
-      }
-    });
-    profileUiReady = true;
-  }
+  profileUiReady = true;
 }
 
 function saveCurrentProfile() {
@@ -971,7 +1038,6 @@ function saveCurrentProfile() {
 function newProfile() {
   activeProfileId = null;
   writeProfilesStore();
-  document.getElementById('profileSelect').value = '';
   document.getElementById('profileName').value = '';
   document.getElementById('apiKey').value = '';
   document.getElementById('endpoint').value = '';
@@ -985,14 +1051,13 @@ function newProfile() {
   const status = document.getElementById('modelsStatus');
   if (status) status.textContent = '';
   modelCatalog = new Map();
+  renderProfileSelect();
   setProfileStatus('');
   validateRunButton();
 }
 
 function deleteCurrentProfile() {
-  const select = document.getElementById('profileSelect');
-  const id = select && select.value;
-  const profile = profiles.find(p => p.id === id);
+  const profile = profiles.find(p => p.id === activeProfileId);
   if (!profile) {
     setProfileStatus(t('profileNone'));
     return;
